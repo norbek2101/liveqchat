@@ -46,6 +46,7 @@ def check_user(chat_id):
 def register_user(user: BotUser, bot: TeleBot):
     user: BotUser
     if not user.phone_number:
+        print('not phone number')
         bot.send_message(
             chat_id=user.chat_id,
             text=Text.PHONE_NUMBER,
@@ -55,6 +56,7 @@ def register_user(user: BotUser, bot: TeleBot):
         return False
 
     if not user.firstname:
+        print('not firstname')
         bot.send_message(
             chat_id=user.chat_id,
             text=Text.FIRST_NAME,
@@ -64,6 +66,7 @@ def register_user(user: BotUser, bot: TeleBot):
         return False
 
     if not user.lastname:
+        print('not lastname')
         bot.send_message(
             chat_id=user.chat_id,
             text=Text.LAST_NAME,
@@ -71,13 +74,12 @@ def register_user(user: BotUser, bot: TeleBot):
         )
         bot.set_state(user.chat_id, MyStates.last_name, user.chat_id)
         return False
-
     return True
 
 def check_token(token):
     new_bot = TeleBot(token)
     try:
-        res = new_bot.get_me()
+        new_bot.get_me()
         return True
     except:
         return False

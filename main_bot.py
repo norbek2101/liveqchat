@@ -18,7 +18,7 @@ from telebot.types import BotCommand
 from telebot import custom_filters
 from django.conf import settings
 from telebot import types
-
+from telebot.types import ReplyKeyboardRemove
 
 TOKEN = settings.BOT_TOKEN
 state_storage = StatePickleStorage()
@@ -27,21 +27,30 @@ bot = telebot.TeleBot(TOKEN, state_storage=state_storage)
 
 @bot.message_handler(commands=['start'])
 def start_handler(message: types.Message):
-    bot.send_message(message.chat.id, Text.WELCOME, parse_mode='HTML')
+    print('start_handler')
+    bot.send_message(
+        chat_id=message.chat.id, 
+        text=Text.WELCOME, 
+        parse_mode='HTML',
+        reply_markup=ReplyKeyboardRemove()
+    )
     bot.set_state(message.chat.id, MyStates.main, message.chat.id)
 
 
 @bot.message_handler(commands=['help'])
 def help_handler(message: types.Message):
+    print('help_handler')
     bot.send_message(
         chat_id=message.chat.id,
         text=Text.HELP,
-        parse_mode='HTML'
+        parse_mode='HTML',
+        reply_markup=ReplyKeyboardRemove()
     )
 
 
 @bot.message_handler(commands=['register'])
 def register_handler(message: types.Message):
+    print('register_handler')
     user, created = BotUser.objects.get_or_create(
             from_main_bot=True,
             chat_id=message.chat.id
@@ -56,6 +65,7 @@ def register_handler(message: types.Message):
 
 @bot.message_handler(commands=['mybots'])
 def mybots_handler(message: types.Message):
+    print('mybots_handler')
     result = check_user(message.chat.id)
     if not result:
         bot.send_message(
@@ -76,17 +86,27 @@ def mybots_handler(message: types.Message):
             text=Text.BOTS_NOT_FOUND,
         )
 
-@bot.message_handler(state=MyStates.phone_number)
+# @bot.message_handler(state=MyStates.phone_number)
+@bot.message_handler(content_types=['contact'])
 def contact_handler(message: types.Message):
-    user: BotUser = BotUser.objects.get_or_create(
+    print('contact_handler')
+    user, created = BotUser.objects.get_or_create(
             from_main_bot=True,
             chat_id=message.chat.id
         )
+    user: BotUser
     if message.content_type == 'contact':
         if message.contact.user_id == message.chat.id:
             user.__setattr__('phone_number', message.contact.phone_number)
             user.save()
-            check_user(user, bot)
+            result = register_user(user, bot)
+            if result:
+                bot.send_message(
+                    chat_id=user.chat_id,
+                    text=Text.REGISTRATION_COMPLETED,
+                    reply_markup=ReplyKeyboardRemove()
+                )
+                bot.set_state(user.chat_id, MyStates.main, user.chat_id)
         else:
             bot.send_message(
                 chat_id=message.chat.id,
@@ -102,32 +122,54 @@ def contact_handler(message: types.Message):
 
 @bot.message_handler(state=MyStates.first_name)
 def first_name_handler(message: types.Message):
-    user: BotUser = BotUser.objects.get_or_create(
+    print('first_name_handler')
+    user, created = BotUser.objects.get_or_create(
             from_main_bot=True,
             chat_id=message.chat.id
         )
-    user.__setattr__('first_name', message.text)
+    user: BotUser
+    user.__setattr__('firstname', message.text)
     user.save()
+    result = register_user(user, bot)
+    if result:
+        bot.send_message(
+            chat_id=user.chat_id,
+            text=Text.REGISTRATION_COMPLETED,
+            reply_markup=ReplyKeyboardRemove()
+        )
+        bot.set_state(user.chat_id, MyStates.main, user.chat_id)
 
 
 @bot.message_handler(state=MyStates.last_name)
 def last_name_handler(message: types.Message):
-    user: BotUser = BotUser.objects.get_or_create(
+    print('last_name_handler')
+    user, created = BotUser.objects.get_or_create(
             from_main_bot=True,
             chat_id=message.chat.id
         )
-    user.__setattr__('first_name', message.text)
+    user: BotUser
+    user.__setattr__('lastname', message.text)
     user.save()
+    result = register_user(user, bot)
+    if result:
+        bot.send_message(
+            chat_id=user.chat_id,
+            text=Text.REGISTRATION_COMPLETED,
+            reply_markup=ReplyKeyboardRemove()
+        )
+        bot.set_state(user.chat_id, MyStates.main, user.chat_id)
 
 
 @bot.message_handler(commands=['newbot'])
 def newbot_handler(message: types.Message):
+    print('newbot_handler')
     result = check_user(message.chat.id)
     if not result:
         bot.send_message(
             chat_id=message.chat.id,
             text=Text.NOT_REGISTERED
         )
+        return
     bot.send_message(
         chat_id=message.chat.id,
         text=Text.NEWBOT
@@ -137,6 +179,7 @@ def newbot_handler(message: types.Message):
 
 @bot.message_handler(state=MyStates.newbot)
 def bot_token_handler(message: types.Message):
+    print('bot_token_handler')
     if message.content_type == 'text':
         token = message.text
         status = check_token(token)

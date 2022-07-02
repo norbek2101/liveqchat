@@ -115,6 +115,9 @@ Yordam kerak bo'lsa,
 Yangi bot yaratish /newbot
 """
 
+    REGISTRATION_COMPLETED = """Registratsiya jarayoni yakunlandi.
+Endi quyidagi buyruq orqali yangi bot yaratishingiz mumkin :
+yangi bot yaratish -- /newbot  """
 
 
 
