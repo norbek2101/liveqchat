@@ -73,6 +73,8 @@ def mybots_handler(message: types.Message):
             text=Text.NOT_REGISTERED
         )
         return
+    slave_bots = SlaveBot.objects.filter(owner_id=message.chat.id)
+    bot_list = '\n'.join()
     bot_list = get_bots_list(message.chat.id)
     if bot_list:
         bot.send_message(
@@ -184,7 +186,10 @@ def bot_token_handler(message: types.Message):
         token = message.text
         status = check_token(token)
         if status:
-            slavebot, created = SlaveBot.objects.get_or_create(token=token)
+            slavebot, created = SlaveBot.objects.get_or_create(
+                token=token,
+                owner_id=message.chat.id
+                )
             if created:
                 bot.send_message(
                     chat_id=message.chat.id,

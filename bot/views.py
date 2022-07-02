@@ -6,7 +6,6 @@ from telebot.types import Update
 from bot.factory import bot_initializer
 # from bot.models import SlaveBot
 from django.conf import settings
-from bot import signals
 
 
 # active_bots = SlaveBot.objects.filter(is_active=True)

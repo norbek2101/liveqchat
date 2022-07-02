@@ -130,6 +130,10 @@ SLAVE_BOT_COMMANDS = [
         "command": 'start',
         "description": "Foydalanishni boshlash"
     },
+    {
+        "command": 'register',
+        "description": "Ro'yxatdan o'tish"    
+    },
 ]
 
 MAIN_BOT_COMMANDS = [

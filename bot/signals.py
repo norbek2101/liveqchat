@@ -1,36 +1,50 @@
-# from django.db.models.signals import post_save, post_delete
-# from django.dispatch import receiver
-# from bot.models import SlaveBot
-# from bot.factory import bot_initializer
-# from django.conf import settings
-# from telebot import TeleBot
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from bot.models import SlaveBot
+from bot.factory import bot_initializer
+from django.conf import settings
+from telebot import TeleBot
 
 
-# @receiver(post_save, sender=SlaveBot)
-# def slavebot_save_handler(sender, instance: SlaveBot, created, **kwargs):
-#     if created and instance.is_active:
-#         bot = bot_initializer(instance.token)
-#         settings.BOTS[instance.token] = bot
-#     if instance.reload and instance.is_active:
-#         bot = bot_initializer(instance.token)
-#         settings.BOTS[instance.token] = bot
-#         instance.reload = False
-#         instance.save()
-#     if not instance.is_active:
-#         try:
-#             bot: TeleBot = settings.BOTS.pop(instance.token)
-#             bot.delete_webhook()
-#         except:
-#             pass
+# def update_bot_info(bot, obj)
+print('signal')
+@receiver(post_save, sender=SlaveBot)
+def slavebot_save_handler(sender, instance: SlaveBot, created, **kwargs):
+    print('signal func')
+    if created and instance.is_active:
+        bot = settings.BOTS.get(instance.token, False)
+        if not bot:
+            bot = bot_initializer(instance.token)
+            settings.BOTS[instance.token] = bot
+        bot_info = bot.get_me()
+        instance.username = bot_info.username
+        instance.name = bot_info.first_name
+        instance.save()
+    if instance.reload and instance.is_active:
+        bot = settings.BOTS.get(instance.token, False)
+        if not bot:
+            bot = bot_initializer(instance.token)
+            settings.BOTS[instance.token] = bot
+        bot_info = bot.get_me()
+        instance.username = bot_info.username
+        instance.name = bot_info.first_name
+        instance.reload = False
+        instance.save()
+    if not instance.is_active:
+        try:
+            bot: TeleBot = settings.BOTS.pop(instance.token)
+            bot.delete_webhook()
+        except:
+            pass
+    
 
-
-# @receiver(post_delete, sender=SlaveBot)
-# def slavebot_delete_handler(sender, instance: SlaveBot, **kwargs):
-#     try:
-#         bot: TeleBot = settings.BOTS.pop(instance.token)
-#         bot.delete_webhook()
-#     except:
-#         pass
+@receiver(post_delete, sender=SlaveBot)
+def slavebot_delete_handler(sender, instance: SlaveBot, **kwargs):
+    try:
+        bot: TeleBot = settings.BOTS.pop(instance.token)
+        bot.delete_webhook()
+    except:
+        pass
 
 
 

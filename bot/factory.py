@@ -2,7 +2,7 @@ from telebot.types import BotCommand
 from telebot import TeleBot
 
 from bot.handlers.chosen_inline_result import initializer_chosen_inline_result_handlers
-from bot.utils.constants import BOT_COMMANDS
+from bot.utils.constants import SLAVE_BOT_COMMANDS
 
 from bot.handlers.message import initializer_message_handlers
 from bot.handlers.callback_query import initializer_callback_query_handlers
@@ -32,7 +32,7 @@ def bot_initializer(token):
             settings.BASE_URL = get_ngrok_url()
 
         print(bot.set_webhook(f"{settings.BASE_URL}/bot/{token}/"))
-        print(bot.set_my_commands([BotCommand(command['command'], command['description']) for command in BOT_COMMANDS]))
+        print(bot.set_my_commands([BotCommand(command['command'], command['description']) for command in SLAVE_BOT_COMMANDS]))
     
     initializer_message_handlers(bot)
     initializer_callback_query_handlers(bot)
