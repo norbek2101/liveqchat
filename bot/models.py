@@ -35,6 +35,7 @@ class BotUser(BaseModel):
     chat_id = models.PositiveIntegerField("chat owner id",null=True, unique=True)
     phone_number = models.CharField(max_length=13, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
+    from_main_bot = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.firstname} {self.lastname}'

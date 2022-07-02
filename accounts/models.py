@@ -1,11 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from accounts.managers import UserManager
-from bot.models import SlaveBot
 from django.db import models
 from bot.utils.abstract import BaseModel
 
+
 class Operators(AbstractUser, BaseModel):
-    slavebot = models.ForeignKey(SlaveBot, on_delete=models.CASCADE, related_name='operators', null=True)
+    slavebot = models.ForeignKey('bot.SlaveBot', on_delete=models.CASCADE, related_name='operators', null=True)
     operator_id = models.CharField("operator id", max_length=15, unique=True)
     username = models.CharField("username", max_length=200, null=True, unique=True)
     photo = models.ImageField(null=True, blank=True)

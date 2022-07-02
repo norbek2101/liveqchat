@@ -1,18 +1,17 @@
-# import traceback
-# from threading import Thread
+import traceback
+from threading import Thread
 from telebot import types, TeleBot
 
-# from bot.utils.constants import STEP, LANGUAGE, CALLBACK, REASONS
-# from bot.utils.helpers import extract_full_name, get_keyboard_markup, get_new_token, sending_post
-# # from bot.models import BotUser, Text, Log
+from bot.utils.constants import STEP, LANGUAGE, CALLBACK, REASONS
+from bot.models import BotUser
 
-# reply_keyboard_remove = types.ReplyKeyboardRemove()
+reply_keyboard_remove = types.ReplyKeyboardRemove()
 
 
 def initializer_message_handlers(_: TeleBot):
     def auth(handler, bot: TeleBot = _):
         def wrapper(message: types.Message, bot: TeleBot = bot):
-#             pass
+            pass
 #             # user: BotUser = BotUser.get(user_id=message.from_user.id)
 #             user = ...
 #             if user:
