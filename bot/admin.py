@@ -10,9 +10,12 @@ class BotAdmin(admin.ModelAdmin):
 
 @admin.register(models.BotUser)
 class BotUserAdmin(admin.ModelAdmin):
-    list_display = [
+    list_display = (
         'id',
         'firstname',
         'lastname',
         'username',
-    ]
+        'slavebot',
+        'from_main_bot',
+        'step',
+    )

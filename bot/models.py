@@ -1,6 +1,8 @@
 from bot.utils.abstract import BaseModel
 from django.db import models
 
+from bot.utils.constants import STEP
+
     
 # def upload_path(instance, filename):
 #     return f"{instance.staff.first_name}/{filename}"
@@ -26,16 +28,17 @@ class SlaveBot(BaseModel):
 
 
 class BotUser(BaseModel):
-    slavebot = models.ManyToManyField(SlaveBot, related_name='users')
-    firstname = models.CharField("first name", max_length=200, null=True)
-    lastname = models.CharField("last name", max_length=200, null=True)
+    slavebot = models.ForeignKey(SlaveBot, on_delete=models.SET_NULL, null=True, related_name='users')
+    firstname = models.CharField("first name", max_length=200, null=True, blank=True)
+    lastname = models.CharField("last name", max_length=200, null=True, blank=True)
     username = models.CharField("username", max_length=200, null=True)
-    photo = models.ImageField(upload_to='botuser/')
+    photo = models.ImageField(upload_to='botuser/', blank=True)
     email = models.EmailField(null=False, blank=False)
-    chat_id = models.PositiveIntegerField("chat owner id",null=True, unique=True)
+    chat_id = models.PositiveIntegerField("chat owner id", null=True, blank=True)
     phone_number = models.CharField(max_length=13, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     from_main_bot = models.BooleanField(default=False)
+    step = models.PositiveSmallIntegerField(default=STEP.MAIN)
 
     def __str__(self):
         return f'{self.firstname} {self.lastname}'
@@ -44,6 +47,19 @@ class BotUser(BaseModel):
         verbose_name = 'Bot foydalanuvchisi'
         verbose_name_plural = 'Bot foydalanuvchilari'
 
+    @classmethod
+    def set_step(self, chat_id: int, step: str, token: str):
+        try:
+            bot_user: self = self.objects.get(
+                chat_id=chat_id,
+                slavebot__token=token
+            )
+            bot_user.step = step
+            bot_user.save()
+            return bot_user.step
+        except self.DoesNotExist:
+            return False
+    
 
 
 class IncomingMessage(BaseModel):

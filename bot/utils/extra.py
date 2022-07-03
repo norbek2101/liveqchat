@@ -2,7 +2,7 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from telebot.handler_backends import State, StatesGroup
 from telebot import types, TeleBot
 from bot.models import BotUser, SlaveBot
-from bot.utils.constants import Text, BtnText
+from bot.utils.constants import STEP, Text, BtnText
 from django.conf import settings
 
 
@@ -76,11 +76,50 @@ def register_user(user: BotUser, bot: TeleBot):
         return False
     return True
 
+
+def slavebot_register_user(user: BotUser, bot: TeleBot):
+    user: BotUser
+    if not user.phone_number:
+        bot.send_message(
+            chat_id=user.chat_id,
+            text=Text.PHONE_NUMBER,
+            reply_markup=make_keyboards('phone_number')
+        )
+        step = BotUser.set_step(user.chat_id, STEP.PHONE_NUMBER, bot.token)
+        print('not phone number step : ', step)
+        return False
+
+    if not user.firstname:
+        bot.send_message(
+            chat_id=user.chat_id,
+            text=Text.FIRST_NAME,
+            reply_markup=ReplyKeyboardRemove()
+        )
+        step = BotUser.set_step(user.chat_id, STEP.FIRST_NAME, bot.token)
+        print('not firstname step : ', step)
+        return False
+
+    if not user.lastname:
+        bot.send_message(
+            chat_id=user.chat_id,
+            text=Text.LAST_NAME,
+            reply_markup=ReplyKeyboardRemove()
+        )
+        step = BotUser.set_step(user.chat_id, STEP.LAST_NAME, bot.token)
+        print('not lastname step : ', step)
+        return False
+    return True
+
+
+
 def check_token(token):
     new_bot = TeleBot(token)
     try:
-        new_bot.get_me()
-        return True
+        bot_info = new_bot.get_me()
+        return {
+            'username': bot_info.username,
+            'name': bot_info.first_name
+            }
     except:
         return False
 
@@ -91,7 +130,13 @@ def get_bots_list(chat_id):
     keys = []
     for slave_bot in slave_bots:
         slave_bot: SlaveBot
-        keys.append(InlineKeyboardButton(slave_bot.name, url=slave_bot.username))
+        bot_link = "https://t.me/{}".format(slave_bot.username.replace('@', ''))
+        keys.append(
+            InlineKeyboardButton(
+                slave_bot.name, 
+                url=bot_link
+                )
+            )
     inline_markup.add(*keys)
     result = False
     if keys:

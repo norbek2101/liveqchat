@@ -15,9 +15,12 @@ class LANGUAGE:
 
 
 class STEP:
-    MAIN = 0
+    MAIN = 1
+    PHONE_NUMBER = 2
+    FIRST_NAME = 3
+    LAST_NAME = 4
 
-    GETTING_POST_MESSAGE = 1
+    GETTING_POST_MESSAGE = 10
 
 
 class CALLBACK:
@@ -118,6 +121,10 @@ Yangi bot yaratish /newbot
     REGISTRATION_COMPLETED = """Registratsiya jarayoni yakunlandi.
 Endi quyidagi buyruq orqali yangi bot yaratishingiz mumkin :
 yangi bot yaratish -- /newbot  """
+
+    REGISTRATION_COMPLETED_SLAVE_BOT = """Registratsiya jarayoni yakunlandi.
+Savollaringizni yozishingiz mumkin.    
+"""
 
 
 

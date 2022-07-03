@@ -4,17 +4,17 @@ from telebot import TeleBot
 from telebot.types import Update
 
 from bot.factory import bot_initializer
-# from bot.models import SlaveBot
+from bot.models import SlaveBot
 from django.conf import settings
 
 
-# active_bots = SlaveBot.objects.filter(is_active=True)
+active_bots = SlaveBot.objects.filter(is_active=True)
 
-# for bot in active_bots:
-#     bot: TeleBot = bot_initializer(bot.token)
-#     settings.BOTS[bot.token] = bot
+for bot in active_bots:
+    bot: TeleBot = bot_initializer(bot.token)
+    settings.BOTS[bot.token] = bot
 
-# print(settings.BOTS)
+print(settings.BOTS)
 
 @csrf_exempt
 def web_hook(request, token):
@@ -28,7 +28,7 @@ def web_hook(request, token):
         else:
             return JsonResponse({'ok': False, 'description': 'Incorrect format of content type.'})
     else:
-        return
+        return JsonResponse({'ok': False, 'description': 'Incorrect token.'})
         # slave_bots = SlaveBot.objects.filter(
         #     is_active=True,
         #     token=token
