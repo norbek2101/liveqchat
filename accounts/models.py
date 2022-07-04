@@ -13,6 +13,7 @@ class Operators(AbstractUser, BaseModel):
     email = models.EmailField(null=True, blank=True)
     is_operator = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_online = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
