@@ -186,23 +186,25 @@ def bot_token_handler(message: types.Message):
         token = message.text
         info = check_token(token)
         if isinstance(info, dict):
-            slavebot, created = SlaveBot.objects.get_or_create(
+            slavebot = SlaveBot.get(
                 token=token,
-                owner_id=message.chat.id
                 )
-            if created:
-                slavebot.username = info['username']
-                slavebot.name = info['name']
-                slavebot.save()
-                bot.send_message(
-                    chat_id=message.chat.id,
-                    text=Text.BOT_CREATED
-                )
-                bot.set_state(message.chat.id, MyStates.main, message.chat.id)
-            else:
+            if slavebot:
                 bot.send_message(
                     chat_id=message.chat.id,
                     text=Text.BOT_ALREADY_CREATED
+                )
+                bot.set_state(message.chat.id, MyStates.main, message.chat.id)
+            else:
+                slavebot = SlaveBot.objects.create(
+                    token=token,
+                    owner_id=message.chat.id,
+                    username=info['username'],
+                    name=info['name']
+                )
+                bot.send_message(
+                    chat_id=message.chat.id,
+                    text=Text.BOT_CREATED
                 )
                 bot.set_state(message.chat.id, MyStates.main, message.chat.id)
         else:

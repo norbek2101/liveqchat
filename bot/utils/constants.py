@@ -76,7 +76,9 @@ class MESSAGE:
 
 
 class Text:
-    WELCOME = """Assalom alekum, Livegram botimizga xush kelibsiz!
+    WELCOME = """Assalomu alakum, 
+Livegram botimizga xush kelibsiz!
+
 <b>Foydalish uchun:</b>
 /start - Tizimni qayta ishga tushirish.
 /register - Registratsiyadan o'tish.
@@ -122,10 +124,20 @@ Yangi bot yaratish /newbot
 Endi quyidagi buyruq orqali yangi bot yaratishingiz mumkin :
 yangi bot yaratish -- /newbot  """
 
+
+
+    WELCOME_SLAVE_BOT = "LiveQChat botiga hush kelibsiz"
+
     REGISTRATION_COMPLETED_SLAVE_BOT = """Registratsiya jarayoni yakunlandi.
 Savollaringizni yozishingiz mumkin.    
 """
+    HELP_SLAVE_BOT = """Botdan foydalanish bo'yicha ko'rsatmalar
 
+<b>Foydalish uchun:</b>
+/start - Tizimni qayta ishga tushirish.
+/register - Registratsiyadan o'tish.
+
+Aloqa uchun: (99)640-55-99"""
 
 
 class BtnText:
@@ -141,6 +153,10 @@ SLAVE_BOT_COMMANDS = [
         "command": 'register',
         "description": "Ro'yxatdan o'tish"    
     },
+    {
+        "command": "help",
+        "description": "Yordam"
+    }
 ]
 
 MAIN_BOT_COMMANDS = [

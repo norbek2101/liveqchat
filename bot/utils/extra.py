@@ -46,7 +46,6 @@ def check_user(chat_id):
 def register_user(user: BotUser, bot: TeleBot):
     user: BotUser
     if not user.phone_number:
-        print('not phone number')
         bot.send_message(
             chat_id=user.chat_id,
             text=Text.PHONE_NUMBER,
@@ -56,7 +55,6 @@ def register_user(user: BotUser, bot: TeleBot):
         return False
 
     if not user.firstname:
-        print('not firstname')
         bot.send_message(
             chat_id=user.chat_id,
             text=Text.FIRST_NAME,
@@ -66,7 +64,6 @@ def register_user(user: BotUser, bot: TeleBot):
         return False
 
     if not user.lastname:
-        print('not lastname')
         bot.send_message(
             chat_id=user.chat_id,
             text=Text.LAST_NAME,
@@ -86,7 +83,6 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
             reply_markup=make_keyboards('phone_number')
         )
         step = BotUser.set_step(user.chat_id, STEP.PHONE_NUMBER, bot.token)
-        print('not phone number step : ', step)
         return False
 
     if not user.firstname:
@@ -96,7 +92,6 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
             reply_markup=ReplyKeyboardRemove()
         )
         step = BotUser.set_step(user.chat_id, STEP.FIRST_NAME, bot.token)
-        print('not firstname step : ', step)
         return False
 
     if not user.lastname:
@@ -106,7 +101,6 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
             reply_markup=ReplyKeyboardRemove()
         )
         step = BotUser.set_step(user.chat_id, STEP.LAST_NAME, bot.token)
-        print('not lastname step : ', step)
         return False
     return True
 
