@@ -193,7 +193,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            return  await self.send(json.dumps({"message": "User connected", "user": str(user.first_name)}))
+            return  await self.send(json.dumps({"message": "User connected", "user": str(user.id)}))
 
 
            

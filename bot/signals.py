@@ -1,5 +1,9 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.forms import model_to_dict
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from bot.models import SlaveBot, IncomingMessage
 from bot.factory import bot_initializer
 from django.conf import settings
@@ -50,20 +54,20 @@ def slavebot_delete_handler(sender, instance: SlaveBot, **kwargs):
 
 
   
-# @receiver(post_save, sender=IncomingMessage)
-# def msg_created(sender, instance, created, **kwargs):
+@receiver(post_save, sender=IncomingMessage)
+def msg_created(sender, instance, created, **kwargs):
   
-#     if created:
-#         channel_layer = get_channel_layer()
-#         data = model_to_dict(instance)
-#         message = data['message']
-#         async_to_sync(channel_layer.group_send)(
-#                                                     f'operator_{instance.id}',
-#                                                     {
-#                                                         'type': 'send.data',
-#                                                         'data': message
-#                                                     }
-#                                                 )
+    if created:
+        channel_layer = get_channel_layer()
+        data = model_to_dict(instance)
+        message = data['message']
+        async_to_sync(channel_layer.group_send)(
+                                                    f'operator_{instance.id}',
+                                                    {
+                                                        'type': 'send.data',
+                                                        'data': message
+                                                    }
+                                                )
 #         else:
 #             operators = Operators.objects.all().values_list("operator_id", flat=True)[0]
 #             print("operators",operators)
