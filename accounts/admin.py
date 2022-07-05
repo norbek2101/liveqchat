@@ -55,7 +55,6 @@ class OperatorChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
-@admin.register(Operators)
 class OperatorAdmin(BaseUserAdmin):
     form = OperatorChangeForm
     add_form = OperatorCreationForm
@@ -98,4 +97,3 @@ class OperatorAdmin(BaseUserAdmin):
     
     def get_image(self, obj):
         return mark_safe(f'<img src={obj.picture.url} width="120" height="80"')
-

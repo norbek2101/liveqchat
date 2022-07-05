@@ -4,6 +4,9 @@ migrations/
 *.py[cod]
 *$py.class
 
+# testing query
+querytest.py
+
 # C extensions
 *.so
 

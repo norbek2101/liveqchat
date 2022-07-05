@@ -41,7 +41,7 @@ class BotUser(BaseModel):
     step = models.PositiveSmallIntegerField(default=STEP.MAIN)
 
     def __str__(self):
-        return f'{self.firstname} {self.lastname}'
+        return f'{self.id} {self.username}'
 
     class Meta:
         verbose_name = 'Bot foydalanuvchisi'

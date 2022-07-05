@@ -44,3 +44,8 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'photo',
         'is_read',
     )
+    list_editable = (
+        'user', 
+        'operator',
+        'slavebot'
+    )
