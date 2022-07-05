@@ -82,7 +82,8 @@ class OperatorAdmin(BaseUserAdmin):
         (None, {'fields': (
                             "operator_id", "first_name", "last_name",
                             "username", "email", "phone_number",
-                            "is_operator", "is_admin", "photo", "password"
+                            "is_operator", "is_admin", "photo", "is_online",
+                            "date_online"
         )}),
         ('Bots_related', {'fields': ('slavebot',)}),
     )
