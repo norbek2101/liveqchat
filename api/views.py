@@ -513,25 +513,25 @@ class Statistics(APIView):
                                                     created_at__lte=timezone.now().replace(hour=i,minute=59,second=59,microsecond=59)
                                                     ).count() for i in range(24) 
                                    ]}
-        operator_id = Operators.objects.filter(id=request.user.id)\
-                      .values_list("operator_id", flat=True)[0]
-        print("operator_id", operator_id)
+        # operator_id = Operators.objects.filter(id=request.user.id)\
+        #               .values_list("operator_id", flat=True)[0]
+        # print("operator_id", operator_id)
        
-        parent_dir = f"{settings.BOT_FILES}"
+        # parent_dir = f"{settings.BOT_FILES}"
         
-        dir_name = f'{operator_id}//statistics/'
-        bot_path = os.path.join(parent_dir, dir_name)
+        # dir_name = f'{operator_id}//statistics/'
+        # bot_path = os.path.join(parent_dir, dir_name)
         
-        if os.path.exists(bot_path):
-            bot_path
-        else:
-            os.makedirs(bot_path)
+        # if os.path.exists(bot_path):
+        #     bot_path
+        # else:
+        #     os.makedirs(bot_path)
           
         df = pd.DataFrame(data)
-        with pd.ExcelWriter(f"{bot_path}/data.xlsx") as writer:
+        with pd.ExcelWriter("data.xlsx") as writer:
             df.to_excel(writer, index=False)
-
         return Response(df)
+
 
 
 class BlackListView(APIView):

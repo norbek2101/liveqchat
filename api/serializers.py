@@ -19,7 +19,7 @@ class BotUserSerializer(serializers.ModelSerializer):
         model = BotUser
         fields = (
                   'firstname', 'lastname', 'username',
-                  'picture', 'email', 'phone_number', 'chat_id'
+                  'photo', 'email', 'phone_number', 'chat_id'
                 )
 
 
@@ -28,7 +28,7 @@ class SlaveBotSerializer(serializers.ModelSerializer):
     class Meta:
         model = SlaveBot
         fields = (
-                   'id', 'token', 'name', 'picture', 'username',
+                   'id', 'token', 'name', 'photo', 'username',
                    'description', 'information_text', 'first_msg',
                    'created_at'
         )
@@ -38,16 +38,16 @@ class OperatorSerializer(serializers.ModelSerializer):
         model = Operators
         fields = (
                     'operator_id', 'first_name', 'last_name', 'username',
-                    'picture', 'email', 'phone_number'
+                    'photo', 'email', 'phone_number'
                  )
-        extra_kwargs = {'picture': {'required':False}, 'operator_id': {'read_only': True}}
+        extra_kwargs = {'photo': {'required':False}, 'operator_id': {'read_only': True}}
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotUser
         fields = (
-            'firstname', 'lastname', 'picture', 'chat_id'
+            'firstname', 'lastname', 'photo', 'chat_id'
         )
 
 class AddOperatorSerializer(serializers.ModelSerializer):

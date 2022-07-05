@@ -176,34 +176,25 @@ class SearchConsumer(AsyncJsonWebsocketConsumer):
 
 class ChatListConsumer(AsyncJsonWebsocketConsumer):
     
-    def _get_connection_id(self):
-        return ''.join(e for e in self.channel_name if e.isalnum())
+    # def _get_connection_id(self):
+    #     return ''.join(e for e in self.channel_name if e.isalnum())
     
     async def connect(self):
         user = self.scope.get('user', False)
-        connection_id = self._get_connection_id()
-        print("connection_id",connection_id)
-
         await self.accept()
-        await self.send_json({"connection_id": str(connection_id), })
-
-        await create_operator_connection_id(user.id, connection_id)
-        operators = await online_operators()
-        print("operators:", operators)
 
         if user.is_anonymous:
             await self.send_json({"user": str(user), 'errors': user.get_errors})
             return await self.close()
-        
         else:
-                self.room_group_name =  f"operator_{connection_id}"
-                print("room group name", self.room_group_name)
-                '''Join room group'''
-                await self.channel_layer.group_add(
-                                                    self.room_group_name,
-                                                    self.channel_name
-                                                )
-                return  await self.send(json.dumps({"message": "Operator connected", "operator": str(user.id)}))
+            self.room_group_name = f"user_{user.id}"
+            '''Join room group'''
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            return  await self.send(json.dumps({"message": "User connected", "user": str(user.first_name)}))
+
 
            
     async def receive(self, text_data):
@@ -211,7 +202,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
         
         content = json.loads(text_data)
         await self.channel_layer.group_send(
-                                            'operator', 
+                                            f"operator_{user.id}", 
                                                         {
                                                         'type': 'send.data',
                                                         'data': content

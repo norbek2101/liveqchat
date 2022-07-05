@@ -8,13 +8,13 @@ from bot.models import SlaveBot
 from django.conf import settings
 
 
-active_bots = SlaveBot.objects.filter(is_active=True)
+# active_bots = SlaveBot.objects.filter(is_active=True)
 
-for bot in active_bots:
-    bot: TeleBot = bot_initializer(bot.token)
-    settings.BOTS[bot.token] = bot
+# for bot in active_bots:
+#     bot: TeleBot = bot_initializer(bot.token)
+#     settings.BOTS[bot.token] = bot
 
-print(settings.BOTS)
+# print(settings.BOTS)
 
 @csrf_exempt
 def web_hook(request, token):
