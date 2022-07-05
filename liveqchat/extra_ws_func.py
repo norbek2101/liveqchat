@@ -1,3 +1,4 @@
+from ast import operator
 import math
 from django.utils import timezone
 from django.db.models import Q
@@ -125,19 +126,21 @@ def online_operators():
 @sync_to_async
 def set_online_date_operator(operator_id):
     try:
-        operator_change = Operators.objects.get(id=operator_id)
+        operator = Operators.objects.get(id=operator_id)
     except Operators.DoesNotExist:
         return "Error"
-    operator_change.is_online = True
-    operator_change.date_online = timezone.now()   
-    operator_change.save()
+    operator.is_online = True
+    operator.date_online = timezone.now()   
+    operator.save()
+    return operator
 
 @sync_to_async
 def set_offline_status(operator_id):
     try:
-        operator_change = Operators.objects.get(id=operator_id)
+        operator = Operators.objects.get(id=operator_id)
     except Operators.DoesNotExist:
         return "Error"
-    operator_change.is_online = False
-    operator_change.date_online = timezone.now()   
-    operator_change.save()
+    operator.is_online = False
+    operator.date_online = timezone.now()   
+    operator.save()
+    return operator
