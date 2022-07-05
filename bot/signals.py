@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from bot.models import SlaveBot, IncomingMessage
+from accounts.models import Operators
 from bot.factory import bot_initializer
 from django.conf import settings
 from telebot import TeleBot
@@ -61,43 +62,17 @@ def msg_created(sender, instance, created, **kwargs):
         channel_layer = get_channel_layer()
         data = model_to_dict(instance)
         message = data['message']
-        async_to_sync(channel_layer.group_send)(
-                                                    f'operator_{instance.operator.id}',
-                                                    {
-                                                        'type': 'send.data',
-                                                        'data': message
-                                                    }
-                                                )
-#         else:
-#             operators = Operators.objects.all().values_list("operator_id", flat=True)[0]
-#             print("operators",operators)
-#             operator_incmsg = IncomingMessage.objects.filter(operator_id__in=operators)\
-#                                                     .order_by("created_at").values_list("operator_id", flat=True)[0]
-#             print("operator_incmsg", operator_incmsg)
-#             channel_layer = get_channel_layer()
-#             data = model_to_dict(instance)
-#             message = data['message']
-#             async_to_sync(channel_layer.group_send)(
-#                                                         "operator",
-#                                                         {
-#                                                             'type': 'send.data',
-#                                                             'data': message
-#                                                         }
-#                                                     )
-        
-
-
-# @receiver(post_save, sender=OperatorConnection)
-# def oper_conn_created(sender, instance, created, **kwargs):  
-#     if created: 
-#         print("connection created")           
-#         channel_layer = get_channel_layer()
-#         data = model_to_dict(instance)
-#         #message = data['message']
-#         async_to_sync(channel_layer.group_send)(
-#                                                     f"operator_{instance.connection_id}",
-#                                                     {
-#                                                         'type': 'send.data',
-#                                                         'data': data
-#                                                     }
-#                                                 )
+        online_operators = Operators.objects.filter(
+            is_online=True
+        ).order_by('date_online')
+        if online_operators.exists():
+            operator = online_operators.first()
+            async_to_sync(
+                channel_layer.group_send)(
+                                            f'operator_{operator.id}',
+                                            {
+                                                'type': 'send.data',
+                                                'data': message
+                                            }
+                                        )
+                                        
