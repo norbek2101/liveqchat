@@ -10,7 +10,7 @@ from bot.factory import bot_initializer
 from django.conf import settings
 from telebot import TeleBot
 
-
+    
 # def update_bot_info(bot, obj)
 print('signal')
 @receiver(post_save, sender=SlaveBot)

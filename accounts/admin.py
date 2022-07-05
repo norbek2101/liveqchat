@@ -81,7 +81,7 @@ class OperatorAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': (
                             "operator_id", "first_name", "last_name",
-                            "username", "email", "phone_number",
+                            "username", "email", "phone_number", 'is_active',
                             "is_operator", "is_admin", "photo", "is_online",
                             "date_online"
         )}),
