@@ -62,7 +62,7 @@ def msg_created(sender, instance, created, **kwargs):
         data = model_to_dict(instance)
         message = data['message']
         async_to_sync(channel_layer.group_send)(
-                                                    f'operator_{instance.id}',
+                                                    f'operator_{instance.operator.id}',
                                                     {
                                                         'type': 'send.data',
                                                         'data': message
