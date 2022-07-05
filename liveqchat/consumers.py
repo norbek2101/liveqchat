@@ -1,13 +1,16 @@
+from ast import operator
 import json
+from pytz import timezone
 import telegram
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from json.decoder import JSONDecodeError
 from requests import Response
+from accounts.models import Operators
 from bot.models import BotUser
 from liveqchat.extra_ws_func import (
-                            create_operator_connection_id, discard_operator_connection_id,
                             get_all_msg_list, get_search_message, get_all_msg_from_db,
-                            filter_msg_by_user, online_operators, send_msg_to_, get_bot_id
+                            filter_msg_by_user, send_msg_to_, get_bot_id, set_offline_status,
+                            set_online_date_operator
                             )
 
 
@@ -180,20 +183,21 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
     #     return ''.join(e for e in self.channel_name if e.isalnum())
     
     async def connect(self):
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
         await self.accept()
 
-        if user.is_anonymous:
-            await self.send_json({"user": str(user), 'errors': user.get_errors})
+        if operator.is_anonymous:
+            await self.send_json({"operator": str(operator), 'errors': operator.get_errors})
             return await self.close()
         else:
-            self.room_group_name = f"user_{user.id}"
+            await set_online_date_operator(operator.id)
+            self.room_group_name = f"operator_{operator.id}"
             '''Join room group'''
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
-            return  await self.send(json.dumps({"message": "User connected", "user": str(user.id)}))
+            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.id)}))
 
 
            
@@ -202,7 +206,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
         
         content = json.loads(text_data)
         await self.channel_layer.group_send(
-                                            f"operator_{user.id}", 
+                                            f"operator_{operator.id}", 
                                                         {
                                                         'type': 'send.data',
                                                         'data': content
@@ -216,7 +220,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
         except JSONDecodeError as e:
             return await self.send(json.dumps({'error': str(e)}))
         
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
         ACTIONS = ['get']
         action = content.pop('action', False)
 
@@ -224,7 +228,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
             return  await self.send_json({"errors": {"action": 'This field is required!'}})
         
         elif action == 'get':
-            oper_id = user.id
+            oper_id = operator.id
             
             try:
                 result = await get_all_msg_from_db(oper_id)
@@ -242,10 +246,10 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def disconnect(self, code):
-        user = self.scope.get('user', False)
-        await discard_operator_connection_id(user.id)
+        operator = self.scope.get('user', False)
+        await set_offline_status(operator.id)
         try:
-            if not user.is_anonymous:
+            if not operator.is_anonymous:
                 await self.channel_layer.group_discard(
                                                         self.room_group_name,
                                                         self.channel_name

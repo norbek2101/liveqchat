@@ -1,7 +1,9 @@
 import math
+from django.utils import timezone
 from django.db.models import Q
 from asgiref.sync import sync_to_async
 from bot.models import BotUser, IncomingMessage, SlaveBot#, OperatorConnection
+from accounts.models import Operators
 from api.serializers import (
                             ChatSerializer, SearchSerializer, SendMessageSerializer,
                             ChatListSerializer, OperatorConnectionSerializer
@@ -119,3 +121,23 @@ def online_operators():
     # serializer = OperatorConnectionSerializer(online_opers, many=True)
     # # print("online_opers", online_opers)
     # return serializer.data
+
+@sync_to_async
+def set_online_date_operator(operator_id):
+    try:
+        operator_change = Operators.objects.get(id=operator_id)
+    except Operators.DoesNotExist:
+        return "Error"
+    operator_change.is_online = True
+    operator_change.date_online = timezone.now()   
+    operator_change.save()
+
+@sync_to_async
+def set_offline_status(operator_id):
+    try:
+        operator_change = Operators.objects.get(id=operator_id)
+    except Operators.DoesNotExist:
+        return "Error"
+    operator_change.is_online = False
+    operator_change.date_online = timezone.now()   
+    operator_change.save()
