@@ -9,10 +9,10 @@ from accounts.models import Operators
 from bot.factory import bot_initializer
 from django.conf import settings
 from telebot import TeleBot
+from django.db.models import Count, Q
 
 
-# def update_bot_info(bot, obj)
-print('signal')
+
 @receiver(post_save, sender=SlaveBot)
 def slavebot_save_handler(sender, instance: SlaveBot, created, **kwargs):
     print('signal func')
@@ -51,22 +51,36 @@ def slavebot_delete_handler(sender, instance: SlaveBot, **kwargs):
     except:
         pass
 
-
-
-
   
 @receiver(post_save, sender=IncomingMessage)
-def msg_created(sender, instance, created, **kwargs):
-  
+def msg_created(sender, instance: IncomingMessage, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
         data = model_to_dict(instance)
         message = data['message']
-        online_operators = Operators.objects.filter(
-            is_online=True
-        ).order_by('date_online')
-        if online_operators.exists():
-            operator = online_operators.first()
+        bot_operators = Operators.objects.filter(
+            slavebot=instance.slavebot,
+            is_active=True
+        )
+        old_operators = bot_operators.annotate(
+            total_msg=Count(
+                'messages', filter=Q(
+                    messages__user=instance.user
+                    )
+                )
+        )
+        operator = None
+        if old_operators.exists():
+            operator = old_operators.first()
+        else:
+            online_operators = bot_operators.filter(
+                is_online=True
+            ).order_by('date_online')
+            if online_operators.exists():
+                operator = online_operators.first()
+        if operator is not None:
+            instance.operator = operator
+            instance.save()
             async_to_sync(
                 channel_layer.group_send)(
                                             f'operator_{operator.id}',
@@ -75,4 +89,3 @@ def msg_created(sender, instance, created, **kwargs):
                                                 'data': message
                                             }
                                         )
-                                        
