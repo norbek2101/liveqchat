@@ -60,18 +60,22 @@ class OperatorAdmin(BaseUserAdmin):
     form = OperatorChangeForm
     add_form = OperatorCreationForm
 
-    list_display = (
-                    'id', "operator_id", 'first_name',
-                    'last_name', 'username', 'phone_number',
-                    'email', 'photo', 'is_operator', 'is_admin',
-                    'date_online', 'is_online'
-                    )
+    # list_display = (
+    #                 'id', "operator_id", 'first_name',
+    #                 'last_name', 'username', 'phone_number',
+    #                 'email', 'photo', 'is_operator', 'is_admin',
+    #                 'date_online', 'is_online'
+    #                 )
+    list_display = ('id', 'operator_id', 'is_online', 'date_online')
     
+    # list_editable = (
+    #                  'email', 'photo','first_name',
+    #                  'last_name', 'is_operator', 'is_admin',
+    #                  'username', 'phone_number'
+    #                  )
     list_editable = (
-                     'email', 'photo','first_name',
-                     'last_name', 'is_operator', 'is_admin',
-                     'username', 'phone_number'
-                     )
+                        'is_online', 'date_online'
+                    )
     
     list_filter = ('id',)
     fieldsets = (
