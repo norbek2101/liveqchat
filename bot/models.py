@@ -68,6 +68,7 @@ class IncomingMessage(BaseModel):
     slavebot = models.ForeignKey(SlaveBot, on_delete=models.CASCADE, null=True, related_name='messages')
     reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replied_messages', null=True, blank=True)
     message = models.CharField(max_length=10000, null=True)
+    message_id = models.BigIntegerField('botdan yozilgan xabar IDsi', null=True, blank=True)
     photo = models.ImageField(null=True, blank=True)
     is_read = models.BooleanField(default=False)
     
