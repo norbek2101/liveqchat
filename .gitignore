@@ -3,6 +3,7 @@ __pycache__/
 migrations/
 *.py[cod]
 *$py.class
+.state-save/
 
 # testing query
 querytest.py
