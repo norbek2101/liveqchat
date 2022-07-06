@@ -67,7 +67,7 @@ def msg_created(sender, instance: IncomingMessage, created, **kwargs):
                     messages__user=instance.user
                     )
                 )
-        )
+        ).order_by('-total_msg')
         operator = None
         if old_operators.exists():
             operator = old_operators.first()
@@ -77,9 +77,18 @@ def msg_created(sender, instance: IncomingMessage, created, **kwargs):
             ).order_by('date_online')
             if online_operators.exists():
                 operator = online_operators.first()
+        print('operator : ', operator)
         if operator is not None:
             instance.operator = operator
             instance.save()
+            if operator.username:
+                print(operator.username)
+                bot = TeleBot(instance.slavebot.token)
+                bot.forward_message(
+                    chat_id=operator.username,
+                    from_chat_id=instance.user.chat_id,
+                    message_id=instance.message_id,
+                )
             async_to_sync(
                 channel_layer.group_send)(
                                             f'operator_{operator.id}',

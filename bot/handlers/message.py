@@ -75,7 +75,7 @@ def initializer_message_handlers(_: TeleBot):
         BotUser.set_step(message.chat.id, STEP.MAIN, bot.token)
 
     @_.message_handler(commands=['help'])
-    def help_handler(message: types.Message, user: BotUser, bot: TeleBot = _):
+    def help_handler(message: types.Message, bot: TeleBot = _):
         bot.send_message(
             chat_id=message.chat.id, 
             text=Text.HELP_SLAVE_BOT, 
@@ -192,10 +192,11 @@ def initializer_message_handlers(_: TeleBot):
             chat_id=message.chat.id,
             text=f'msg : {message.text}'
         )
-        inc_msg = IncomingMessage.objects.create(
+        IncomingMessage.objects.create(
             user=user,
             slavebot=user.slavebot,
             message=message.text,
+            message_id=message.message_id,
         )
         # TODO IncomingMessage obyekti socket orqali jo'natiladi
 

@@ -163,6 +163,8 @@ AUTH_USER_MODEL = 'accounts.Operators'
 
 BOT_TOKEN = ENV['BOT_TOKEN']
 
+NGROK_AUTHTOKEN = ENV['NGROK_AUTHTOKEN']
+
 BASE_URL = None
 
 BOTS = {}
@@ -245,3 +247,93 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     send_default_pii=True
 )
+
+# from core.logging_handlers import CustomHandler
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        },
+    },
+    'handlers': {
+        'main_debug': {
+            'class': 'logging.FileHandler',
+            # 'class': CustomFileHandler,
+            # 'class': 'core.CustomHandler',
+            'filename': f'{BASE_DIR}/logs/django/debug.log',
+            'formatter': 'default',
+        },
+        'socket': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs/daphne/debug.log',
+            'formatter': 'default',
+        },
+        'other': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs/others/warning.log',
+            'formatter': 'default',
+        },
+        'printing': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs/others/printing.log',
+            'formatter': 'default',
+        },
+        'bot': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs/bot/debug.log',
+            'formatter': 'default',
+        },
+        # 'slave_bot': {
+        #     'class': 'logging.FileHandler',
+        #     'filename': f'{BASE_DIR}/clients/logs/slave_bot/debug.log',
+        #     'formatter': 'default',
+        # }
+        # 'telegram': {
+        #     'class': 'python_telegram_logger.Handler',
+        #     'token': '5142838675:AAFiLX7xVFKyDFYqVpvRMN3Q_wIndc7T20w',
+        #     'chat_ids': ['5142838675','632179390'],
+        #     'filename': f'{BASE_DIR}/logs/bot/debug.log',
+        #     "formatter": "default"
+        # #     
+        
+        # },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['main_debug'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'daphne': {
+            'handlers': ['socket'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.printing.messages': {
+            'handlers': ['printing'],
+        },
+        # 'bot.asosiy': {
+        #     'handlers': ['bot'],
+        #     'level': 'INFO',
+        #     'propagate': True,
+        # },
+        # 'bot.slave': {
+        #     'level': 'INFO',
+        #     'handlers': ['slave_bot'],
+        #     'propagate': True,
+        # },
+        # '': {
+        #     'level': 'INFO',
+        #     'handlers': ['other'],
+        # },
+        # 'tg': {
+        #     'level': 'INFO',
+        #     'handlers': ['telegram',],
+        #     'propagate': True,
+        # },
+    },
+}

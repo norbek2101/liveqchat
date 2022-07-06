@@ -15,9 +15,8 @@ from pyngrok import ngrok
 
 init = True
 
-
 def get_ngrok_url():
-    ngrok.set_auth_token("20C3MTphX0ZW9rYTVem3ah0oHau_7zVYbTBGHewNjLLX8Xqp1")
+    ngrok.set_auth_token(settings.NGROK_AUTHTOKEN)
     https_tunnel = ngrok.connect(8000, bind_tls=True)
     print(https_tunnel.public_url)
     BASE_URL = https_tunnel.public_url
