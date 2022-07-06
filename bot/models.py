@@ -61,7 +61,6 @@ class BotUser(BaseModel):
             return False
     
 
-
 class IncomingMessage(BaseModel):
     user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name='messages', null= True)
     operator = models.ForeignKey('accounts.Operators', on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
@@ -71,6 +70,7 @@ class IncomingMessage(BaseModel):
     message_id = models.BigIntegerField('botdan yozilgan xabar IDsi', null=True, blank=True)
     photo = models.ImageField(null=True, blank=True)
     is_read = models.BooleanField(default=False)
+    is_sent = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

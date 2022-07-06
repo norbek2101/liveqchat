@@ -1,14 +1,12 @@
-from email.message import Message
-import traceback
-from threading import Thread
-from telebot import types, TeleBot
-
+from bot.utils.extra import make_keyboards, slavebot_register_user
 from bot.utils.constants import STEP, LANGUAGE, CALLBACK, REASONS
 from bot.models import BotUser, IncomingMessage, SlaveBot
-from bot.utils.extra import make_keyboards, slavebot_register_user
 from bot.utils.helpers import extract_full_name
 from bot.utils.constants import Text, BtnText
 from telebot.util import content_type_media
+from bot.extra_func import send_to_operator
+from telebot import types, TeleBot
+
 
 
 def initializer_message_handlers(_: TeleBot):
@@ -190,13 +188,14 @@ def initializer_message_handlers(_: TeleBot):
             return
         bot.send_message(
             chat_id=message.chat.id,
-            text=f'msg : {message.text}'
+            text="Xabaringiz operatorlarga jo'natildi"
         )
-        IncomingMessage.objects.create(
+        inc_msg = IncomingMessage.objects.create(
             user=user,
             slavebot=user.slavebot,
             message=message.text,
             message_id=message.message_id,
         )
-        # TODO IncomingMessage obyekti socket orqali jo'natiladi
+        status = send_to_operator(inc_msg)
+        print(f'message sent status {status}\n')
 
