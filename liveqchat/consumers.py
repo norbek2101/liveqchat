@@ -1,11 +1,8 @@
-from ast import operator
 import json
-from pytz import timezone
 import telegram
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from json.decoder import JSONDecodeError
 from requests import Response
-from accounts.models import Operators
 from bot.models import BotUser
 from liveqchat.extra_ws_func import (
                             get_all_msg_list, get_search_message, get_all_msg_from_db,
@@ -17,24 +14,24 @@ from liveqchat.extra_ws_func import (
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
         await self.accept()
 
-        if user.is_anonymous:
-            await self.send_json({"user": str(user), 'errors': user.get_errors})
+        if operator.is_anonymous:
+            await self.send_json({"operator": str(operator), 'errors': operator.get_errors})
             return await self.close()
         else:
-            self.room_group_name = f"user_{user.id}"
+            self.room_group_name = f"operator_{operator.id}"
             '''Join room group'''
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
-            return  await self.send(json.dumps({"message": "User connected", "user": str(user.first_name)}))
+            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.first_name)}))
 
     async def receive(self, text_data):
         """
-        ACTIONS : 'create', 'get', 'get-list;
+        ACTIONS : 'create', 'get', 'get-list';
         """
         try:
             content = json.loads(text_data)
@@ -45,7 +42,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         except JSONDecodeError as e:
             return await self.send(json.dumps({'error': str(e)}))
         
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
         ACTIONS = ['create', 'get', 'get-list']
         action = content.pop('action', False)
 
@@ -54,7 +51,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
        
         elif action == 'create':
 
-            result = await send_msg_to_(self, content, user)
+            result = await send_msg_to_(self, content, operator)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -67,7 +64,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             page = content.pop('page', False)
             page_size = content.pop('page_size', False)
             user_id = content.pop('user_id', False)
-            bot_id = await get_bot_id(user)
+            bot_id = await get_bot_id(operator)
             result = await filter_msg_by_user(user_id, bot_id, page, page_size)
 
             if not result:
@@ -75,7 +72,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return await self.send_message({"data": result})
 
         elif action == 'get-list':
-            oper_id = user.id
+            oper_id = operator.id
             try:
                 result = await get_all_msg_from_db(oper_id)
             except Exception as e:
@@ -91,9 +88,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def disconnect(self, code):
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
+        await set_offline_status(operator.id)
+
         try:
-            if not user.is_anonymous:
+            if not operator.is_anonymous:
                 await self.channel_layer.group_discard(
                             self.room_group_name,
                             self.channel_name
@@ -111,20 +110,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 class SearchConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
         await self.accept()
 
-        if user.is_anonymous:
-            await self.send_json({"user": str(user), 'errors': user.get_errors})
+        if operator.is_anonymous:
+            await self.send_json({"operator": str(operator), 'errors': operator.get_errors})
             return await self.close()
         else:
-            self.room_group_name = f"search_{user.id}"
+            self.room_group_name = f"search_{operator.id}"
             '''Join room group'''
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
-            return  await self.send(json.dumps({"message": "User connected", "user": str(user.first_name)}))
+            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.first_name)}))
 
     async def receive(self, text_data):
         """
@@ -164,9 +163,10 @@ class SearchConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def disconnect(self, code):
-        user = self.scope.get('user', False)
+        operator = self.scope.get('user', False)
+        await set_offline_status(operator.id)
         try:
-            if not user.is_anonymous:
+            if not operator.is_anonymous:
                 await self.channel_layer.group_discard(
                             self.room_group_name,
                             self.channel_name
@@ -178,15 +178,14 @@ class SearchConsumer(AsyncJsonWebsocketConsumer):
 
 
 class ChatListConsumer(AsyncJsonWebsocketConsumer):
-    
-    # def _get_connection_id(self):
-    #     return ''.join(e for e in self.channel_name if e.isalnum())
-    
+
+
     async def connect(self):
         operator = self.scope.get('user', False)
         await self.accept()
 
         if operator.is_anonymous:
+            await set_offline_status(operator.id)
             await self.send_json({"operator": str(operator), 'errors': operator.get_errors})
             return await self.close()
         else:
@@ -200,10 +199,10 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
             return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.id)}))
 
 
-           
+
     async def receive(self, text_data):
         """ACTIONS : 'get'"""
-        
+    
         content = json.loads(text_data)
         await self.channel_layer.group_send(
                                             f"operator_{operator.id}", 
@@ -214,6 +213,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
                                             )
         try:
             if not isinstance(content, dict):
+                await set_offline_status(operator.id)
                 return await self.send(json.dumps({
                         'error': 'expected type json, got str instead'}))
         

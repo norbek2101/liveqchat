@@ -1,13 +1,12 @@
-from ast import operator
 import math
 from django.utils import timezone
 from django.db.models import Q
 from asgiref.sync import sync_to_async
-from bot.models import BotUser, IncomingMessage, SlaveBot#, OperatorConnection
+from bot.models import BotUser, IncomingMessage, SlaveBot
 from accounts.models import Operators
 from api.serializers import (
-                            ChatSerializer, SearchSerializer, SendMessageSerializer,
-                            ChatListSerializer, OperatorConnectionSerializer
+                            ChatSerializer, SearchSerializer, 
+                            ChatListSerializer, SendMessageSerializer
                             )
 
 
@@ -130,7 +129,7 @@ def set_online_date_operator(operator_id):
     except Operators.DoesNotExist:
         return "Error"
     operator.is_online = True
-    operator.date_online = timezone.now()   
+    operator.date_online = timezone.now()
     operator.save()
     return operator
 
@@ -141,6 +140,6 @@ def set_offline_status(operator_id):
     except Operators.DoesNotExist:
         return "Error"
     operator.is_online = False
-    operator.date_online = timezone.now()   
+    operator.date_online = timezone.now()
     operator.save()
     return operator
