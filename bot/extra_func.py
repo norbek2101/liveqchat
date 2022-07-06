@@ -36,31 +36,38 @@ def send_to_operator(instance: IncomingMessage):
             operator = online_operators.first()
     print('operator : ', operator)
     if operator is not None:
-        instance.operator = operator
-        instance.save()
-        if operator.username:
-            operator: Operators
-            chat_id: str = operator.username
-            from_chat_id: str = instance.slavebot.username
-            if not chat_id.startswith('@'):
-                chat_id = '@' + chat_id
-            if not from_chat_id.startswith('@'):
-                from_chat_id = '@' + from_chat_id
-            print(chat_id)
-            print(from_chat_id)
-            bot = TeleBot(instance.slavebot.token)
-            bot.forward_message(
-                chat_id=chat_id,
-                from_chat_id=from_chat_id,
-                message_id=instance.message_id,
-            )
-        async_to_sync(
-            channel_layer.group_send)(
-                                        f'operator_{operator.id}',
-                                        {
-                                            'type': 'send.data',
-                                            'data': message
-                                        }
-                                    )
+        try:
+            instance.operator = operator
+            async_to_sync(
+                channel_layer.group_send)(
+                                            f'operator_{operator.id}',
+                                            {
+                                                'type': 'send.data',
+                                                'data': message
+                                            }
+                                        )
+            instance.is_sent = True
+            if operator.username:
+                operator: Operators
+                chat_id: str = operator.username
+                from_chat_id: str = instance.slavebot.username
+                if not chat_id.startswith('@'):
+                    chat_id = '@' + chat_id
+                if not from_chat_id.startswith('@'):
+                    from_chat_id = '@' + from_chat_id
+                print(chat_id)
+                print(from_chat_id)
+                bot = TeleBot(instance.slavebot.token)
+                bot.forward_message(
+                    chat_id=chat_id,
+                    from_chat_id=from_chat_id,
+                    message_id=instance.message_id,
+                )
+            instance.is_sent = True
+        except:
+            pass
+        finally:
+            instance.save()
+            
     return True
 
