@@ -248,7 +248,6 @@ sentry_sdk.init(
     send_default_pii=True
 )
 
-# from core.logging_handlers import CustomHandler
 
 LOGGING = {
     'version': 1,
@@ -262,8 +261,6 @@ LOGGING = {
     'handlers': {
         'main_debug': {
             'class': 'logging.FileHandler',
-            # 'class': CustomFileHandler,
-            # 'class': 'core.CustomHandler',
             'filename': f'{BASE_DIR}/logs/django/debug.log',
             'formatter': 'default',
         },
@@ -287,20 +284,11 @@ LOGGING = {
             'filename': f'{BASE_DIR}/logs/bot/debug.log',
             'formatter': 'default',
         },
-        # 'slave_bot': {
-        #     'class': 'logging.FileHandler',
-        #     'filename': f'{BASE_DIR}/clients/logs/slave_bot/debug.log',
-        #     'formatter': 'default',
-        # }
-        # 'telegram': {
-        #     'class': 'python_telegram_logger.Handler',
-        #     'token': '5142838675:AAFiLX7xVFKyDFYqVpvRMN3Q_wIndc7T20w',
-        #     'chat_ids': ['5142838675','632179390'],
-        #     'filename': f'{BASE_DIR}/logs/bot/debug.log',
-        #     "formatter": "default"
-        # #     
-        
-        # },
+        'slave_bots': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/clients/logs/debug.log',
+            'formatter': 'default',
+        },
     },
     'loggers': {
         'django': {
@@ -316,24 +304,15 @@ LOGGING = {
         'django.printing.messages': {
             'handlers': ['printing'],
         },
-        # 'bot.asosiy': {
-        #     'handlers': ['bot'],
-        #     'level': 'INFO',
-        #     'propagate': True,
-        # },
-        # 'bot.slave': {
-        #     'level': 'INFO',
-        #     'handlers': ['slave_bot'],
-        #     'propagate': True,
-        # },
-        # '': {
-        #     'level': 'INFO',
-        #     'handlers': ['other'],
-        # },
-        # 'tg': {
-        #     'level': 'INFO',
-        #     'handlers': ['telegram',],
-        #     'propagate': True,
-        # },
+        'bot.asosiy': {
+            'handlers': ['bot'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'slavebot': {
+            'handlers': ['slave_bots'],
+            'level': 'INFO',
+            'propagate': True,
+        }
     },
 }

@@ -82,7 +82,7 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
             text=Text.PHONE_NUMBER,
             reply_markup=make_keyboards('phone_number')
         )
-        step = BotUser.set_step(user.chat_id, STEP.PHONE_NUMBER, bot.token)
+        BotUser.set_step(user.chat_id, STEP.PHONE_NUMBER, bot.token)
         return False
 
     if not user.firstname:
@@ -91,7 +91,7 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
             text=Text.FIRST_NAME,
             reply_markup=ReplyKeyboardRemove()
         )
-        step = BotUser.set_step(user.chat_id, STEP.FIRST_NAME, bot.token)
+        BotUser.set_step(user.chat_id, STEP.FIRST_NAME, bot.token)
         return False
 
     if not user.lastname:
@@ -100,7 +100,7 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
             text=Text.LAST_NAME,
             reply_markup=ReplyKeyboardRemove()
         )
-        step = BotUser.set_step(user.chat_id, STEP.LAST_NAME, bot.token)
+        BotUser.set_step(user.chat_id, STEP.LAST_NAME, bot.token)
         return False
     return True
 

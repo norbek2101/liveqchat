@@ -1,15 +1,31 @@
 from bot.utils.extra import make_keyboards, slavebot_register_user
-from bot.utils.constants import STEP, LANGUAGE, CALLBACK, REASONS
 from bot.models import BotUser, IncomingMessage, SlaveBot
-from bot.utils.helpers import extract_full_name
 from bot.utils.constants import Text, BtnText
 from telebot.util import content_type_media
 from bot.extra_func import send_to_operator
+from bot.utils.constants import STEP
 from telebot import types, TeleBot
+from loguru import logger as lg
+from django.conf import settings
+import logging
+
+
+
+def get_bot_logger(token):
+    try:
+        slave_bot: SlaveBot = SlaveBot.objects.get(token=token)
+        bot_date = slave_bot.created_at.strftime('%Y_%m_%d')
+        file_name = f"{settings.BASE_DIR}/clients/{slave_bot.owner_id}/{token[:10]}_{bot_date}.log"
+        return lg.add(file_name)
+    except Exception as e:
+        logger = logging.getLogger('slavebot')
+        logger.warning(f"bot writes logs to another file {e.args}")
+        return logger
 
 
 
 def initializer_message_handlers(_: TeleBot):
+    logger = get_bot_logger(_.token)
     def auth(handler, bot: TeleBot = _):
         def wrapper(message: types.Message, bot: TeleBot = bot):
             try:
@@ -28,7 +44,7 @@ def initializer_message_handlers(_: TeleBot):
                     )
                     handler(message, user)
             except Exception as e:
-                print(f'[ERROR] auth : {e}\n')
+                logger.error(e)
         return wrapper
 
     def check_user(chat_id: int, bot: TeleBot):
@@ -38,6 +54,7 @@ def initializer_message_handlers(_: TeleBot):
                 slavebot__token=bot.token
                 )
         except BotUser.DoesNotExist:
+            logger.info('bot user does not exist')
             return False
         user: BotUser
         is_registered = all(
@@ -52,14 +69,17 @@ def initializer_message_handlers(_: TeleBot):
         return True
 
     def check_step(message: types.Message, step):
-        user: BotUser = BotUser.get(
-            chat_id=message.from_user.id,
-            slavebot__token=_.token
-            )
-        if user:
-            return user.step == step
-        else:
-            return True
+        try:
+            user: BotUser = BotUser.get(
+                chat_id=message.from_user.id,
+                slavebot__token=_.token
+                )
+            if user:
+                return user.step == step
+            else:
+                return True
+        except BotUser.DoesNotExist as e:
+            logger.error(e)
 
     @_.message_handler(commands=['start'])
     @auth
@@ -93,7 +113,7 @@ def initializer_message_handlers(_: TeleBot):
                     text=Text.ALREADY_REGISTER
                 )
         except Exception as e:
-            print(f'[ERROR] register handler : {e}\n')
+            logger.error(f"register handler : {e}")
 
     @_.message_handler(
         content_types=content_type_media,
@@ -196,6 +216,8 @@ def initializer_message_handlers(_: TeleBot):
             message=message.text,
             message_id=message.message_id,
         )
-        status = send_to_operator(inc_msg)
-        print(f'message sent status {status}\n')
+        try:
+            send_to_operator(inc_msg, logger)
+        except Exception as e:
+            logger.warning(e)
 
