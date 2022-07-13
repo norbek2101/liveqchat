@@ -21,6 +21,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 ENV = dotenv_values(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
@@ -229,8 +230,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = '123456Qwerty$'
-EMAIL_HOST_USER = 'otkirgadoyev24@gmail.com'
+EMAIL_HOST_PASSWORD = ENV['EMAIL_HOST_PASSWORD']
+EMAIL_HOST_USER = ENV['EMAIL_HOST_USER']
 
 
 gettext = lambda s: s
@@ -279,6 +280,7 @@ LOGGING = {
             'filename': f'{BASE_DIR}/logs/others/printing.log',
             'formatter': 'default',
         },
+<<<<<<< HEAD
         'bot': {
             'class': 'logging.FileHandler',
             'filename': f'{BASE_DIR}/logs/bot/debug.log',
@@ -289,6 +291,27 @@ LOGGING = {
             'filename': f'{BASE_DIR}/clients/logs/debug.log',
             'formatter': 'default',
         },
+=======
+            'bot': {
+                'class': 'logging.FileHandler',
+                'filename': f'{BASE_DIR}/logs/bot/debug.log',
+                'formatter': 'default',
+            },
+        # 'slave_bot': {
+        #     'class': 'logging.FileHandler',
+        #     'filename': f'{BASE_DIR}/clients/logs/slave_bot/debug.log',
+        #     'formatter': 'default',
+        # }
+        # 'telegram': {
+        #     'class': 'python_telegram_logger.Handler',
+        #     'token': '5142838675:AAFiLX7xVFKyDFYqVpvRMN3Q_wIndc7T20w',
+        #     'chat_ids': ['5142838675','632179390'],
+        #     'filename': f'{BASE_DIR}/logs/bot/debug.log',
+        #     "formatter": "default"
+        # #     
+        
+        # },
+>>>>>>> 30b2d1fe49add3c90f55d326ebb0eddfe82769db
     },
     'loggers': {
         'django': {
@@ -309,10 +332,27 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+<<<<<<< HEAD
         'slavebot': {
             'handlers': ['slave_bots'],
             'level': 'INFO',
             'propagate': True,
         }
+=======
+        # 'bot.slave': {
+        #     'level': 'INFO',
+        #     'handlers': ['slave_bot'],
+        #     'propagate': True,
+        # },
+        # '': {
+        #     'level': 'INFO',
+        #     'handlers': ['other'],
+        # },
+        # 'tg': {
+        #     'level': 'INFO',
+        #     'handlers': ['telegram',],
+        #     'propagate': True,
+        # },
+>>>>>>> 30b2d1fe49add3c90f55d326ebb0eddfe82769db
     },
 }

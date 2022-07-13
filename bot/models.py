@@ -24,7 +24,7 @@ class SlaveBot(BaseModel):
     error_msg = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.name} {self.username}"
+        return f"{self.username}"
 
 
 class BotUser(BaseModel):
@@ -33,7 +33,7 @@ class BotUser(BaseModel):
     lastname = models.CharField("last name", max_length=200, null=True, blank=True)
     username = models.CharField("username", max_length=200, null=True)
     photo = models.ImageField(upload_to='botuser/', blank=True)
-    email = models.EmailField(null=False, blank=False)
+    email = models.EmailField(null=True, blank=True)
     chat_id = models.PositiveIntegerField("chat owner id", null=True, blank=True)
     phone_number = models.CharField(max_length=13, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
@@ -41,7 +41,7 @@ class BotUser(BaseModel):
     step = models.PositiveSmallIntegerField(default=STEP.MAIN)
 
     def __str__(self):
-        return f'{self.id} {self.username}'
+        return f'{self.id}'
 
     class Meta:
         verbose_name = 'Bot foydalanuvchisi'

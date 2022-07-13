@@ -24,6 +24,7 @@ def get_ngrok_url():
 
 
 def bot_initializer(token):
+    
     bot: TeleBot = TeleBot(token, parse_mode='html')
 
     if init:
