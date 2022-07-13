@@ -280,25 +280,16 @@ LOGGING = {
             'filename': f'{BASE_DIR}/logs/others/printing.log',
             'formatter': 'default',
         },
-            'bot': {
-                'class': 'logging.FileHandler',
-                'filename': f'{BASE_DIR}/logs/bot/debug.log',
-                'formatter': 'default',
-            },
-        # 'slave_bot': {
-        #     'class': 'logging.FileHandler',
-        #     'filename': f'{BASE_DIR}/clients/logs/slave_bot/debug.log',
-        #     'formatter': 'default',
-        # }
-        # 'telegram': {
-        #     'class': 'python_telegram_logger.Handler',
-        #     'token': '5142838675:AAFiLX7xVFKyDFYqVpvRMN3Q_wIndc7T20w',
-        #     'chat_ids': ['5142838675','632179390'],
-        #     'filename': f'{BASE_DIR}/logs/bot/debug.log',
-        #     "formatter": "default"
-        # #     
-        
-        # },
+        'bot': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs/bot/debug.log',
+            'formatter': 'default',
+        },
+        'slave_bots': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/clients/logs/debug.log',
+            'formatter': 'default',
+        },
     },
     'loggers': {
         'django': {
@@ -319,19 +310,10 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        # 'bot.slave': {
-        #     'level': 'INFO',
-        #     'handlers': ['slave_bot'],
-        #     'propagate': True,
-        # },
-        # '': {
-        #     'level': 'INFO',
-        #     'handlers': ['other'],
-        # },
-        # 'tg': {
-        #     'level': 'INFO',
-        #     'handlers': ['telegram',],
-        #     'propagate': True,
-        # },
+        'slavebot': {
+            'handlers': ['slave_bots'],
+            'level': 'INFO',
+            'propagate': True,
+        }
     },
 }
