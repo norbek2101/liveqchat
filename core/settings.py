@@ -249,7 +249,6 @@ sentry_sdk.init(
     send_default_pii=True
 )
 
-# from core.logging_handlers import CustomHandler
 
 LOGGING = {
     'version': 1,
@@ -263,8 +262,6 @@ LOGGING = {
     'handlers': {
         'main_debug': {
             'class': 'logging.FileHandler',
-            # 'class': CustomFileHandler,
-            # 'class': 'core.CustomHandler',
             'filename': f'{BASE_DIR}/logs/django/debug.log',
             'formatter': 'default',
         },
@@ -283,6 +280,18 @@ LOGGING = {
             'filename': f'{BASE_DIR}/logs/others/printing.log',
             'formatter': 'default',
         },
+<<<<<<< HEAD
+        'bot': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs/bot/debug.log',
+            'formatter': 'default',
+        },
+        'slave_bots': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/clients/logs/debug.log',
+            'formatter': 'default',
+        },
+=======
             'bot': {
                 'class': 'logging.FileHandler',
                 'filename': f'{BASE_DIR}/logs/bot/debug.log',
@@ -302,6 +311,7 @@ LOGGING = {
         # #     
         
         # },
+>>>>>>> 30b2d1fe49add3c90f55d326ebb0eddfe82769db
     },
     'loggers': {
         'django': {
@@ -322,6 +332,13 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+<<<<<<< HEAD
+        'slavebot': {
+            'handlers': ['slave_bots'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+=======
         # 'bot.slave': {
         #     'level': 'INFO',
         #     'handlers': ['slave_bot'],
@@ -336,5 +353,6 @@ LOGGING = {
         #     'handlers': ['telegram',],
         #     'propagate': True,
         # },
+>>>>>>> 30b2d1fe49add3c90f55d326ebb0eddfe82769db
     },
 }

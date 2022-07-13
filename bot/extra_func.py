@@ -5,11 +5,10 @@ from django.forms import model_to_dict
 from asgiref.sync import async_to_sync
 from django.db.models import Count, Q
 from telebot import TeleBot
+from loguru import logger as lg
 
 
-
-def send_to_operator(instance: IncomingMessage):
-    print("send_operator")
+def send_to_operator(instance: IncomingMessage, logger: lg):
     if instance.is_sent:
         return False
     channel_layer = get_channel_layer()
