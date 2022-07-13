@@ -15,7 +15,7 @@ def get_bot_logger(token):
     try:
         slave_bot: SlaveBot = SlaveBot.objects.get(token=token)
         bot_date = slave_bot.created_at.strftime('%Y_%m_%d')
-        file_name = f"{settings.BASE_DIR}/clients/{slave_bot.owner_id}/{token[:10]}_{bot_date}.log"
+        file_name = f"{settings.BASE_DIR}/clients/{slave_bot.owner_id}/{token[:10]}_{bot_date}/debug.log"
         return lg.add(file_name)
     except Exception as e:
         logger = logging.getLogger('slavebot')
