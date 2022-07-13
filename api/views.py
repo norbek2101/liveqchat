@@ -196,7 +196,7 @@ class DailyReport(APIView):
         """messagega javob berilgan vaqt""" 
         end_list =[]
         for i in reply_time:
-           end_list.append(i.answer_time)
+           end_list.append(i.updated_at)
 
         """xabarlarga javob berish uchun ketgan o'rtacha vaqt"""
         times = []
@@ -252,7 +252,7 @@ class DashBoardDaily(APIView):
         """messagega javob berilgan vaqt""" 
         end_list =[]
         for i in reply_time:
-           end_list.append(i.answer_time)
+           end_list.append(i.updated_at)
 
         """xabarlarga javob berish uchun ketgan o'rtacha vaqt"""
         times = []
@@ -305,7 +305,7 @@ class WeeklyReport(APIView):
         """messagega javob berilgan vaqt""" 
         end_list =[]
         for i in reply_time:
-           end_list.append(i.answer_time)
+           end_list.append(i.updated_at)
 
         """xabarlarga javob berish uchun ketgan o'rtacha vaqt"""
         times = []
@@ -363,7 +363,7 @@ class DashBoardWeekly(APIView):
         """messagega javob berilgan vaqt""" 
         end_list =[]
         for i in reply_time:
-           end_list.append(i.answer_time)
+           end_list.append(i.updated_at)
 
         """xabarlarga javob berish uchun ketgan o'rtacha vaqt"""
         times = []
@@ -420,7 +420,7 @@ class MonthlyReport(APIView):
         """messagega javob berilgan vaqt""" 
         end_list =[]
         for i in reply_time:
-           end_list.append(i.answer_time)
+           end_list.append(i.updated_at)
 
         """xabarlarga javob berish uchun ketgan o'rtacha vaqt"""
         times = []
@@ -476,7 +476,7 @@ class DashBoardMonthly(APIView):
         """messagega javob berilgan vaqt""" 
         end_list =[]
         for i in reply_time:
-           end_list.append(i.answer_time)
+           end_list.append(i.updated_at)
 
         """xabarlarga javob berish uchun ketgan o'rtacha vaqt"""
         times = []
