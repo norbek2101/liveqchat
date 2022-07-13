@@ -41,6 +41,7 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'slavebot',
         'reply',
         'message',
+        'message_id',
         'photo',
         'is_read',
     )

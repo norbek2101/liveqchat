@@ -143,3 +143,29 @@ def set_offline_status(operator_id):
     operator.date_online = timezone.now()
     operator.save()
     return operator
+
+
+@sync_to_async
+def mark_as_read_chat_messages(user, bot_id):
+    try:
+        messages = IncomingMessage.objects.filter(user__chat_id=user, slavebot=bot_id, is_read=False)
+        if messages:
+            messages.update(is_read=True)
+        return {'result': 'ok'}
+    except:
+        return {'result': 'Server error'}
+
+
+@sync_to_async
+def mark_as_read_chat_to_messages(user_id, bot_id, message_id):
+    
+    try:
+        messages = IncomingMessage.objects.filter(user__chat_id=user_id, slavebot=bot_id, message_id__lte=message_id)
+        
+        if messages: 
+            messages.is_read = False
+            messages.update(is_read=False)
+            
+        return {'result': 'ok'}
+    except Exception as e:
+        return {'result': e}
