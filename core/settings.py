@@ -21,6 +21,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 ENV = dotenv_values(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
@@ -229,8 +230,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = '123456Qwerty$'
-EMAIL_HOST_USER = 'otkirgadoyev24@gmail.com'
+EMAIL_HOST_PASSWORD = ENV['EMAIL_HOST_PASSWORD']
+EMAIL_HOST_USER = ENV['EMAIL_HOST_USER']
 
 
 gettext = lambda s: s
@@ -282,11 +283,11 @@ LOGGING = {
             'filename': f'{BASE_DIR}/logs/others/printing.log',
             'formatter': 'default',
         },
-        'bot': {
-            'class': 'logging.FileHandler',
-            'filename': f'{BASE_DIR}/logs/bot/debug.log',
-            'formatter': 'default',
-        },
+            'bot': {
+                'class': 'logging.FileHandler',
+                'filename': f'{BASE_DIR}/logs/bot/debug.log',
+                'formatter': 'default',
+            },
         # 'slave_bot': {
         #     'class': 'logging.FileHandler',
         #     'filename': f'{BASE_DIR}/clients/logs/slave_bot/debug.log',
@@ -316,11 +317,11 @@ LOGGING = {
         'django.printing.messages': {
             'handlers': ['printing'],
         },
-        # 'bot.asosiy': {
-        #     'handlers': ['bot'],
-        #     'level': 'INFO',
-        #     'propagate': True,
-        # },
+        'bot.asosiy': {
+            'handlers': ['bot'],
+            'level': 'INFO',
+            'propagate': True,
+        },
         # 'bot.slave': {
         #     'level': 'INFO',
         #     'handlers': ['slave_bot'],

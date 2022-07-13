@@ -6,7 +6,7 @@ from requests import Response
 from bot.models import BotUser
 from liveqchat.extra_ws_func import (
                             get_all_msg_list, get_search_message, get_all_msg_from_db,
-                            filter_msg_by_user, send_msg_to_, get_bot_id, set_offline_status,
+                            filter_msg_by_user, send_msg_to_user, get_bot_id, set_offline_status,
                             set_online_date_operator
                             )
 
@@ -32,8 +32,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def receive(self, text_data):
+        operator = self.scope.get('user', False)
+        self.room_group_name = f"operator_{operator.id}"
         """
-        ACTIONS : 'create', 'get', 'get-list';
+        ACTIONS : 'create', 'get';
         """
         try:
             content = json.loads(text_data)
@@ -45,7 +47,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return await self.send(json.dumps({'error': str(e)}))
         
         operator = self.scope.get('user', False)
-        ACTIONS = ['create', 'get', 'get-list']
+        ACTIONS = ['create', 'get']
         action = content.pop('action', False)
 
         if not action:
@@ -53,7 +55,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
        
         elif action == 'create':
 
-            result = await send_msg_to_(self, content, operator)
+            result = await send_msg_to_user(self, content, operator)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -73,15 +75,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return await self.send_message("Page Not Found !")
             return await self.send_message({"data": result})
 
-        elif action == 'get-list':
-            oper_id = operator.id
-            try:
-                result = await get_all_msg_from_db(oper_id)
-            except Exception as e:
-                return False
-            return await self.send_message({"data": result})            
-        else:
-            return await  self.send_json({'errors': {"action": f"enter one of the following : {ACTIONS}"}})
+        # elif action == 'get-list':
+        #     oper_id = operator.id
+        #     try:
+        #         result = await get_all_msg_from_db(oper_id)
+        #     except Exception as e:
+        #         return False
+        #     return await self.send_message({"data": result})            
+        # else:
+        #     return await  self.send_json({'errors': {"action": f"enter one of the following : {ACTIONS}"}})
 
 
     async def send_message(self, event):
@@ -204,8 +206,8 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive(self, text_data):
         """ACTIONS : 'get'"""
-    
-        content = json.loads(text_data)
+        
+        operator = self.scope.get('user', False) 
         await self.channel_layer.group_send(
                                             f"operator_{operator.id}", 
                                                         {
@@ -214,6 +216,8 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
                                                         }
                                             )
         try:
+            content = json.loads(text_data)
+            
             if not isinstance(content, dict):
                 await set_offline_status(operator.id)
                 return await self.send(json.dumps({
@@ -222,7 +226,6 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
         except JSONDecodeError as e:
             return await self.send(json.dumps({'error': str(e)}))
         
-        operator = self.scope.get('user', False)
         ACTIONS = ['get']
         action = content.pop('action', False)
 

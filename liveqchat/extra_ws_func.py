@@ -66,7 +66,7 @@ def filter_msg_by_user(user_id, bot_id, page=1, page_size=10):
 
 
 @sync_to_async
-def send_msg_to_(self, content, user):
+def send_msg_to_user(self, content, user):
     serializer = SendMessageSerializer(data=content, context=user)
     if serializer.is_valid():
         serializer.save()
