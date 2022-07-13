@@ -1,35 +1,35 @@
-import os
-import uuid
-import datetime
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.conf import settings
 import pandas as pd
 import telegram
-from django.conf import settings
-from django.utils import timezone
-from datetime import datetime, timedelta
+import datetime
+import uuid
+import os
 from .serializers import (
                           AddOperatorSerializer, ChatListSerializer, ChatSerializer, OperatorSerializer, 
                           ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, 
                           SlaveBotSerializer, ChangePasswordSerializer, SendMessageSerializer, 
                           SendPhotoSerializer, BlackListSerializer
                            )
-from bot.models import BotUser, IncomingMessage, SlaveBot, BlackList
-from accounts.models import Operators
-from api.send_email import Util
-from api.paginations import ChatPagination
-from collections import Counter
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.generics import UpdateAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import  AllowAny, IsAuthenticated
-from rest_framework import generics, status, filters
-from drf_yasg.utils import swagger_auto_schema
-from django.http import Http404
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.urls import reverse
+from bot.models import BotUser, IncomingMessage, SlaveBot, BlackList
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from rest_framework.permissions import  AllowAny, IsAuthenticated
+from rest_framework.parsers import FormParser, MultiPartParser
 from django.contrib.auth.hashers import make_password
+from rest_framework import generics, status, filters
+from rest_framework.generics import UpdateAPIView
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.response import Response
+from api.paginations import ChatPagination
+from rest_framework.views import APIView
+from accounts.models import Operators
+from django.urls import reverse
+from api.send_email import Util
+from collections import Counter
+from django.http import Http404
 
 
 
@@ -220,19 +220,21 @@ class DashBoardDaily(APIView):
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(tags=["DashBoard"])
-    def get(self, request):
+    def get(self, request, slavebot_id):
 
         """xabarlar soni"""
         messages = IncomingMessage.objects.filter(
+                                               slavebot=slavebot_id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                ).count()
-        operators = Operators.objects.all().count()
+        operators = Operators.objects.filter(slavebot=slavebot_id).count()
 
         """suhbatlar soni"""
         convs = list(Counter(IncomingMessage.objects.filter(
-                                               created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
-                                               created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
+                                            slavebot=slavebot_id,
+                                            created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
+                                            created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                )))
         counter = 0
         for i in convs:
@@ -240,6 +242,7 @@ class DashBoardDaily(APIView):
 
         """xabarlarga javob berish uchun ketgan vaqt"""
         reply_time = IncomingMessage.objects.filter(
+                                                slavebot=slavebot_id,   
                                                 created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
                                                 created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                 )
@@ -329,19 +332,21 @@ class DashBoardWeekly(APIView):
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(tags=["DashBoard"])
-    def get(self,request):
+    def get(self,request, slavebot_id):
 
         """operatorlar soni"""
-        operators = Operators.objects.all().count()
+        operators = Operators.objects.filter(slavebot=slavebot_id).count()
 
         """xabarlar soni"""
         messages = IncomingMessage.objects.filter(
+                                        slavebot=slavebot_id,
                                         created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
                                         created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                         ).count()
         
         """suhbatlar soni"""
         convs = list(Counter(IncomingMessage.objects.filter(
+                                               slavebot=slavebot_id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                )))
@@ -351,8 +356,9 @@ class DashBoardWeekly(APIView):
 
         """xabarlarga javob berish uchun ketgan vaqt"""
         reply_time = IncomingMessage.objects.filter(
-                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
-                                               created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
+                                            slavebot=slavebot_id,
+                                            created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
+                                            created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                 )
 
         """message yuborilgan vaqt"""
@@ -444,28 +450,31 @@ class DashBoardMonthly(APIView):
     permission_classes = (AllowAny, )
 
     @swagger_auto_schema(tags=["DashBoard"])
-    def get(self,request):
+    def get(self,request, slavebot_id):
 
         """operatorlar soni"""
-        operators = Operators.objects.all().count()
+        operators = Operators.objects.filter(slavebot=slavebot_id).count()
 
         """xabarlar soni"""
         messages = IncomingMessage.objects.filter(
-                                        created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
-                                        created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
+                                    slavebot=slavebot_id,
+                                    created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
+                                    created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                         ).count()
         """suhbatlar soni"""
         convs = list(Counter(IncomingMessage.objects.filter(
-                                               created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
-                                               created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
+                                            slavebot=slavebot_id,
+                                            created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
+                                            created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                )))
         counter = 0
         for i in convs:
             counter+=1
         """xabarlarga javob berish uchun ketgan vaqt"""
         reply_time = IncomingMessage.objects.filter(
-                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
-                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
+                                            slavebot=slavebot_id,
+                                            created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
+                                            created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                 )
 
         """message yuborilgan vaqt"""
@@ -531,7 +540,6 @@ class Statistics(APIView):
         with pd.ExcelWriter("data.xlsx") as writer:
             df.to_excel(writer, index=False)
         return Response(df)
-
 
 
 class BlackListView(APIView):
