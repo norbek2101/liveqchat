@@ -1,10 +1,13 @@
 from django.db.models.signals import post_save, post_delete
+from loguru import logger
 from bot.models import SlaveBot, IncomingMessage
 from bot.extra_func import send_to_operator
 from bot.factory import bot_initializer
 from django.dispatch import receiver
 from django.conf import settings
+from loguru import logger as lg
 from telebot import TeleBot
+
 
 
 
@@ -52,4 +55,4 @@ def msg_created(sender, instance: IncomingMessage, created, **kwargs):
     if created:
         if instance.is_sent:
             return False
-        send_to_operator(instance)
+        send_to_operator(instance, lg)

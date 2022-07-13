@@ -28,7 +28,8 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             )
     ).filter(total_msg__gt=0).order_by('-total_msg')
 
-    offline_operator = Operators.objects.filter(is_online=False)
+    offline_operator = bot_operators.filter(is_online=False).order_by("date_online")
+    print("offfline_operator", offline_operator)
     operator = None
     if old_operators.exists():
         operator = old_operators.first()
@@ -46,7 +47,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
         if online_operators.exists():
             operator = online_operators.first()
         else:
-            ...
+            operator = offline_operator.first()
     print('operator : ', operator)
     if operator is not None:
         try:
