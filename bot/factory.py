@@ -28,10 +28,10 @@ def bot_initializer(token):
     bot: TeleBot = TeleBot(token, parse_mode='html')
 
     if init:
-        if not settings.BASE_URL:
-            settings.BASE_URL = get_ngrok_url()
-
-        print(bot.set_webhook(f"{settings.BASE_URL}/bot/{token}/"))
+        #if not settings.BASE_URL:
+        #    settings.BASE_URL = get_ngrok_url()
+        BASE_URL = settings.WEBHOOK_URL
+        print(bot.set_webhook(f"{BASE_URL}/bot/{token}/"))
         print(bot.set_my_commands([BotCommand(command['command'], command['description']) for command in SLAVE_BOT_COMMANDS]))
     
     initializer_message_handlers(bot)
