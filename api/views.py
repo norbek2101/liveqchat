@@ -1,11 +1,3 @@
-from datetime import datetime, timedelta
-from django.utils import timezone
-from django.conf import settings
-import pandas as pd
-import telegram
-import datetime
-import uuid
-import os
 from .serializers import (
                           AddOperatorSerializer, ChatListSerializer, ChatSerializer, OperatorSerializer, 
                           ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, 
@@ -26,11 +18,18 @@ from rest_framework.response import Response
 from api.paginations import ChatPagination
 from rest_framework.views import APIView
 from accounts.models import Operators
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.conf import settings
 from django.urls import reverse
 from api.send_email import Util
 from collections import Counter
 from django.http import Http404
-
+import pandas as pd
+import telegram
+import datetime
+import uuid
+import os
 
 
 class BotList(generics.ListAPIView):

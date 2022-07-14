@@ -1,11 +1,12 @@
-from rest_framework import serializers
-from bot.models import BotUser, SlaveBot, IncomingMessage, BlackList#, OperatorConnection
-from accounts.models import Operators
-from django.contrib.auth import password_validation
-from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import  force_str
+from bot.models import BotUser, SlaveBot, IncomingMessage, BlackList
+from rest_framework.exceptions import AuthenticationFailed
+from django.contrib.auth import password_validation
 from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import  force_str
+from rest_framework import serializers
+from accounts.models import Operators
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length = 12)
@@ -32,6 +33,7 @@ class SlaveBotSerializer(serializers.ModelSerializer):
                    'description', 'information_text', 'first_msg',
                    'created_at'
         )
+
 
 class OperatorSerializer(serializers.ModelSerializer):
     class Meta:
