@@ -1,3 +1,6 @@
+import os
+import uuid
+import datetime
 from .serializers import (
                           AddOperatorSerializer, ChatListSerializer, ChatSerializer, OperatorSerializer, 
                           ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, 
@@ -17,8 +20,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from api.paginations import ChatPagination
 from rest_framework.views import APIView
-from accounts.models import Operators
 from datetime import datetime, timedelta
+from accounts.models import Operators
 from django.utils import timezone
 from django.conf import settings
 from django.urls import reverse
@@ -27,9 +30,6 @@ from collections import Counter
 from django.http import Http404
 import pandas as pd
 import telegram
-import datetime
-import uuid
-import os
 
 
 class BotList(generics.ListAPIView):
@@ -73,11 +73,11 @@ class BotDetail(APIView):
         bot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
+   
 class OperatorList(generics.ListCreateAPIView):
     parser_classes = (FormParser, MultiPartParser)
     permission_classes = (AllowAny, )
-    queryset = Operators.objects.all()
+    queryset = Operators.objects.all().order_by("slavebot")
     serializer_class = OperatorSerializer
 
     filter_backends = [filters.SearchFilter]
@@ -159,14 +159,14 @@ class ChatDetail(APIView):
 
 
 class DailyReport(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(tags=["Report"])
-    def get(self, request, operator_id):
+    def get(self, request):
 
         """subatlar soni"""
         convs = list(Counter(IncomingMessage.objects.filter(
-                                               operator__operator_id = operator_id,
+                                               operator__operator_id = request.user.id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                )))
@@ -174,7 +174,7 @@ class DailyReport(APIView):
         """xabarlar soni"""
 
         messages = IncomingMessage.objects.filter(
-                                               operator__operator_id = operator_id,
+                                               operator__operator_id = request.user.id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                ).values_list('message')
@@ -182,7 +182,7 @@ class DailyReport(APIView):
         """xabarlarga javob berish uchun ketgan vaqt"""
 
         reply_time = IncomingMessage.objects.filter(
-                                                operator__operator_id = operator_id,
+                                                operator__operator_id = request.user.id,
                                                 created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0),
                                                 created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                 )
@@ -275,27 +275,27 @@ class DashBoardDaily(APIView):
 
  
 class WeeklyReport(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(tags=["Report"])
-    def get(self,request, operator_id):
+    def get(self,request):
 
         """subatlar soni"""
         convs = list(Counter(IncomingMessage.objects.filter(
-                                               operator__operator_id = operator_id,
+                                               operator__operator_id = request.user.id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                )))
         """xabarlar soni"""
         messages = IncomingMessage.objects.filter(
-                                               operator__operator_id = operator_id,
+                                               operator__operator_id = request.user.id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                ).values_list('message')
 
         """xabarlarga javob berish uchun ketgan vaqt"""
         reply_time = IncomingMessage.objects.filter(
-                                                operator__operator_id = operator_id,
+                                                operator__operator_id = request.user.id,
                                                 created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=6),
                                                 created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                 )
@@ -389,14 +389,14 @@ class DashBoardWeekly(APIView):
 
 
 class MonthlyReport(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(tags=["Report"])
-    def get(self,request, operator_id):
+    def get(self,request):
 
         """subatlar soni"""
         convs = list(Counter(IncomingMessage.objects.filter(
-                                               operator__operator_id = operator_id,
+                                               operator__operator_id = request.user.id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                )))
@@ -405,14 +405,14 @@ class MonthlyReport(APIView):
         for i in convs:
             counter+=1
         messages = IncomingMessage.objects.filter(
-                                               operator__operator_id = operator_id,
+                                               operator__operator_id = request.user.id,
                                                created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
                                                created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                ).values_list('message')
 
         """xabarlarga javob berish uchun ketgan vaqt"""
         reply_time = IncomingMessage.objects.filter(
-                                                operator__operator_id = operator_id,
+                                                operator__operator_id = request.user.id,
                                                 created_at__date__gte=datetime.today().replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=29),
                                                 created_at__date__lte=datetime.today().replace(hour=23,minute=59,second=59,microsecond=59)
                                                 )

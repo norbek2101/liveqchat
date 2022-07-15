@@ -120,6 +120,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
                 'read_only': True
             }
         }
+        
     def validate(self, attrs):
         super().validate(attrs)
         chat_id = attrs['chat_id']
