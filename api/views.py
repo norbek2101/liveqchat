@@ -129,7 +129,7 @@ class OperatorDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    def delete(self, operator_id):
+    def delete(self,request, operator_id):
         operator = self.get_object(operator_id)
         operator.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
