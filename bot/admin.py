@@ -9,7 +9,8 @@ class BotAdmin(admin.ModelAdmin):
         'username', 
         'owner_id', 
         'reload', 
-        'is_active'
+        'is_active',
+        'created_at'
         )
     list_editable = (
         'username', 
