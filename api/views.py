@@ -61,7 +61,7 @@ class BotDetail(APIView):
     @swagger_auto_schema(request_body=SlaveBotSerializer)
     def patch(self, request, pk, format=None):
         bot = self.get_object(pk)
-        serializer = SlaveBotSerializer(instance = bot, data=request.data, partial=True)
+        serializer = SlaveBotSerializer(instance=bot, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
