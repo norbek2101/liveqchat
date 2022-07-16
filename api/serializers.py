@@ -32,7 +32,7 @@ class SlaveBotSerializer(serializers.ModelSerializer):
                    'id', 'token', 'name', 'photo', 'username',
                    'description', 'information_text', 'first_msg'
         )
-        extra_kwargs = {'token': {'required':False}}
+        extra_kwargs = {'token': {'required':False}, 'created_at': {'required': False}}
 
 
 class OperatorSerializer(serializers.ModelSerializer):
