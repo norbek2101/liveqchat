@@ -25,15 +25,14 @@ class BotUserSerializer(serializers.ModelSerializer):
 
 
 class SlaveBotSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(format="%Y_%m_%d")
+    # created_at = serializers.DateTimeField(format="%Y_%m_%d")
     class Meta:
         model = SlaveBot
         fields = (
                    'id', 'token', 'name', 'photo', 'username',
-                   'description', 'information_text', 'first_msg',
-                   'created_at'
+                   'description', 'information_text', 'first_msg'
         )
-        extra_kwargs = {'token': {'required':False}, 'created_at': {'required': False}}
+        extra_kwargs = {'token': {'required':False}}
 
 
 class OperatorSerializer(serializers.ModelSerializer):
