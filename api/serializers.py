@@ -123,6 +123,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
         
     def validate(self, attrs):
         super().validate(attrs)
+
         chat_id = attrs['chat_id']
         slave_bot = self.context.slavebot
 

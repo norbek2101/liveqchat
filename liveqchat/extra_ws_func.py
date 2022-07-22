@@ -1,4 +1,5 @@
 import math
+import telegram
 from django.utils import timezone
 from django.db.models import Q
 from asgiref.sync import sync_to_async
@@ -44,8 +45,8 @@ def get_all_msg_from_db(operator_id):
 
 
 @sync_to_async
-def filter_msg_by_user(user_id, bot_id, page=1, page_size=10):
-    messages = IncomingMessage.objects.filter(Q(user__chat_id=user_id), Q(slavebot=bot_id))
+def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=10):
+    messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id)
     
     if page*page_size > messages.count():
         return False
@@ -77,8 +78,13 @@ def send_msg_to_user(self, content, user):
         self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
         return serializer.data
     else:
-        result = {"errors": serializer.errors}
-        return self.send_json(result)  
+        return serializer.errors  
+
+def send_msg_to_bot(self, msg, chat_id, token):
+        bot = telegram.Bot(token=token)
+        bot.sendMessage(chat_id=chat_id, text=msg)
+
+
 
 
 @sync_to_async

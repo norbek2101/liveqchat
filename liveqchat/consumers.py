@@ -18,25 +18,24 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         if operator.is_anonymous:
+            await set_offline_status(operator.id)
             await self.send_json({"operator": str(operator), 'errors': operator.get_errors})
             return await self.close()
         else:
+            await set_online_date_operator(operator.id)
             self.room_group_name = f"operator_{operator.id}"
             '''Join room group'''
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
-
-            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.first_name)}))
+            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.id)}))
 
 
     async def receive(self, text_data):
         operator = self.scope.get('user', False)
         self.room_group_name = f"operator_{operator.id}"
-        """
-        ACTIONS : 'create', 'get';
-        """
+        
         try:
             content = json.loads(text_data)
             if not isinstance(content, dict):
@@ -45,6 +44,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
         except JSONDecodeError as e:
             return await self.send(json.dumps({'error': str(e)}))
+        
         
         operator = self.scope.get('user', False)
         ACTIONS = ['create', 'get', 'mark-as-read-message', 'mark-as-read-chat']
@@ -59,7 +59,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
-                    'type': 'send_message',
+                    'type': 'send_data',
                     "data": result
                 }
             )
@@ -70,11 +70,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             page_size = content.pop('page_size', False)
             user_id = content.pop('user_id', False)
             bot_id = await get_bot_id(operator)
-            result = await filter_msg_by_user(user_id, bot_id, page, page_size)
+            result = await filter_msg_by_user(user_id, bot_id,operator, page, page_size)
 
             if not result:
-                return await self.send_message("Page Not Found !")
-            return await self.send_message({"data": result})
+                return await self.send_data("Page Not Found !")
+            return await self.send_data({"data": result})
         
         
         elif action == 'mark-as-read-chat':
@@ -88,7 +88,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return await self.send_json({"errors": {"bot_id": 'This field is required!'}})
             
             result = await mark_as_read_chat_messages(user_id, bot_id)
-            return await self.send_message({"data": result})
+            return await self.send_data({"data": result})
 
 
         elif action == 'mark-as-read-message':
@@ -108,10 +108,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             result = await mark_as_read_chat_to_messages(user_id, bot_id, message_id)
             print("result",result)
     
-            return await self.send_message({"data": result})          
+            return await self.send_data({"data": result})          
 
 
-    async def send_message(self, event):
+    async def send_data(self, event):
         data = event['data']
         await self.send_json(data)
 
@@ -143,22 +143,21 @@ class SearchConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         if operator.is_anonymous:
+            await set_offline_status(operator.id)
             await self.send_json({"operator": str(operator), 'errors': operator.get_errors})
             return await self.close()
         else:
-            self.room_group_name = f"search_{operator.id}"
-            
+            await set_online_date_operator(operator.id)
+            self.room_group_name = f"operator_{operator.id}"
             '''Join room group'''
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
-            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.first_name)}))
+            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.id)}))
+
 
     async def receive(self, text_data):
-        """
-        ACTIONS : 'get';
-        """
         try:
             content = json.loads(text_data)
             if not isinstance(content, dict):
@@ -184,11 +183,11 @@ class SearchConsumer(AsyncJsonWebsocketConsumer):
             except BotUser.DoesNotExist:
                 return await Response("Not found")
             
-            return  await self.send_message({"data": data})
+            return  await self.send_data({"data": data})
         else:
             return  await self.send_json({'errors': {"action": f"enter one of the following : {ACTIONS}"}})
 
-    async def send_message(self, event):
+    async def send_data(self, event):
         data = event['data']
         await self.send_json(data)
 
