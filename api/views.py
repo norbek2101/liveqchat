@@ -652,7 +652,10 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
             Util.send_email(data)
-        return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+            return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'failed': 'This email does not exist!'}, status=status.HTTP_404_NOT_FOUND)
+            
 
 
 class PasswordTokenCheckAPI(generics.GenericAPIView):
