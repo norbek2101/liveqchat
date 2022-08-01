@@ -74,16 +74,16 @@ def send_msg_to_user(self, content, user):
         incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
         incmsg.is_read = True
         incmsg.save()
-        botuser = BotUser.objects.get(id=serializer.data['user'])
+        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
         self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
-        print("serializer.data", serializer.data)
-        return {
-                "id": serializer.data["id"],
-                "user": serializer.data['user'],
-                "message": serializer.data["message"],
-                "created_at":serializer.data["created_at"],
-                "slavebot": serializer.data["slavebot"]
-                }
+        return serializer.data
+        # return {
+        #         "id": serializer.data["id"],
+        #         "user": serializer.data['user'],
+        #         "message": serializer.data["message"],
+        #         "created_at":serializer.data["created_at"],
+        #         "slavebot": serializer.data["slavebot"]
+        #         }
     else:
         return serializer.errors  
 

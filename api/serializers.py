@@ -114,12 +114,12 @@ class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'message', 'chat_id', 'user', 'reply', 'slavebot', 'created_at')
-        extra_kwargs = {
-            'user': {
-                'read_only': True
-            }
-        }
+        fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at')
+        # extra_kwargs = {
+        #     'user': {
+        #         'read_only': True
+        #     }
+        # }
         
     def validate(self, attrs):
         super().validate(attrs)
@@ -144,6 +144,14 @@ class SendMessageSerializer(serializers.ModelSerializer):
         validated_data['operator'] = self.context
         print("validated_data", validated_data)
         return super().create(validated_data)  
+
+    def to_representation(self, instance):
+        unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
+        representation = super().to_representation(instance)
+        representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
+        representation['unread_count'] = unread_count
+        representation['user'] = instance.user.chat_id
+        return representation
 
 
 class SendPhotoSerializer(serializers.ModelSerializer):
