@@ -73,7 +73,7 @@ class ChatListSerializer(serializers.ModelSerializer):
         model = IncomingMessage
         fields = (
             'id', 'user', 'message', 'created_at', 'slavebot'
-        )
+            )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}}
 
     def to_representation(self, instance):
@@ -114,7 +114,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'message', 'chat_id', 'user', 'reply')
+        fields = ('id', 'message', 'chat_id', 'user', 'reply', 'slavebot', 'created_at')
         extra_kwargs = {
             'user': {
                 'read_only': True
@@ -142,6 +142,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         validated_data['slavebot'] = slave_bot
         validated_data['operator'] = self.context
+        print("validated_data", validated_data)
         return super().create(validated_data)  
 
 

@@ -59,7 +59,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
                                             f'operator_{operator.id}',
                                             {
                                                 'type': 'send.data',
-                                                'data': message
+                                                'data': data
                                             }
                                         )
             instance.is_sent = True

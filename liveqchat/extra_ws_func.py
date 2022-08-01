@@ -38,7 +38,7 @@ def get_search_message(search_key):
 
 @sync_to_async
 def get_all_msg_from_db(operator_id):
-    messages = IncomingMessage.objects.filter(operator_id=operator_id, is_read=False).order_by("-created_at")
+    messages = IncomingMessage.objects.filter(operator_id=operator_id).order_by("-created_at")
     msg_duplicate = remove_duplicate(messages)
     serializer = ChatListSerializer(msg_duplicate, many=True)
     return serializer.data
@@ -76,7 +76,14 @@ def send_msg_to_user(self, content, user):
         incmsg.save()
         botuser = BotUser.objects.get(id=serializer.data['user'])
         self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
-        return serializer.data
+        print("serializer.data", serializer.data)
+        return {
+                "id": serializer.data["id"],
+                "user": serializer.data['user'],
+                "message": serializer.data["message"],
+                "created_at":serializer.data["created_at"],
+                "slavebot": serializer.data["slavebot"]
+                }
     else:
         return serializer.errors  
 
