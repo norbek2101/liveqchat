@@ -1,3 +1,4 @@
+import os
 import json
 import telegram
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -6,8 +7,9 @@ from requests import Response
 from bot.models import BotUser
 from liveqchat.extra_ws_func import (
                             get_all_msg_list, get_search_message, get_all_msg_from_db,
-                            filter_msg_by_user, mark_as_read_chat_messages, mark_as_read_chat_to_messages, send_msg_to_user, get_bot_id, set_offline_status,
-                            set_online_date_operator
+                            get_bot_id, send_photo_to_user, send_video_to_user, send_voice_to_user, set_offline_status, set_online_date_operator,
+                            filter_msg_by_user, mark_as_read_chat_messages, 
+                            mark_as_read_chat_to_messages, send_msg_to_user, 
                             )
 
 
@@ -53,9 +55,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if not action:
             return  await self.send_json({"errors": {"action": 'This field is required!'}})
        
-        elif action == 'create':
+        elif action == 'send-message':
 
-            result = await send_msg_to_user(self, content, operator)
+            result = await send_msg_to_user(content, operator)
             print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
@@ -64,7 +66,40 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "data": result
                 }
             )
+            
+        elif action == 'send-photo':
+            result = await send_photo_to_user(content, operator)
+            print("result pp", result)
+            return await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_data',
+                    "data": result,
+                },  
+            )
 
+        elif action == 'send-voice':
+            result = await send_voice_to_user(content, operator)
+            print("result", result)
+            return await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_data',
+                    "data": result
+                }
+            )
+        
+        elif action == 'send-video':
+            result = await send_video_to_user(content, operator)
+            print("result", result)
+            return await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_data',
+                    "data": result
+                }
+            )
+        
 
         elif action == 'get':
             page = content.pop('page', False)
@@ -132,9 +167,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         finally:
             return await super().disconnect(code)
 
-    def send_msg_to_bot(self, msg, chat_id, token):
-        bot = telegram.Bot(token=token)
-        bot.sendMessage(chat_id=chat_id, text=msg)
+    # def send_msg_to_bot(msg, chat_id, token):
+    #     bot = telegram.Bot(token=token)
+    #     bot.sendMessage(chat_id=chat_id, text=msg)
+
+
+    # def send_video_to_bot(_file, chat_id, token):
+    #     bot = telegram.Bot(token=token)
+    #     bot.sendVideo(chat_id=chat_id, video=_file, supports_streaming=True)
 
 
 class SearchConsumer(AsyncJsonWebsocketConsumer):

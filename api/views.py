@@ -3,9 +3,9 @@ import uuid
 import datetime
 from .serializers import (
                           AddOperatorSerializer, ChatListSerializer, ChatSerializer, OperatorSerializer, 
-                          ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, 
+                          ResetPasswordEmailRequestSerializer, SavePhotoSerializer, SetNewPasswordSerializer, 
                           SlaveBotSerializer, ChangePasswordSerializer, SendMessageSerializer, 
-                          SendPhotoSerializer, BlackListSerializer
+                          SendPhotoSerializer, BlackListSerializer, SaveFileSerializer
                            )
 from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -614,21 +614,25 @@ class SendMessage(APIView):
 
 class SendPhoto(APIView):
     parser_classes = (FormParser, MultiPartParser)
-    permission_classes  =(AllowAny, )
-    my_token = '5116642374:AAEDrJjCfwaGpw9jc1lpEPwLxK_nS-v9rrQ'
+    permission_classes  =(AllowAny,)
+    my_token = '5462908065:AAGAMYuKOv8sxSP7ObG2xSfQ3lsLbhO0pcA'
+    
+    
+    def send_photo_to_bot(self, photo, chat_id):
+        print("send_photo_to_bot")
+        bot = telegram.Bot(token=self.my_token)
+        bot.send_photo(chat_id=chat_id, photo=photo)
     
     @swagger_auto_schema(request_body=SendPhotoSerializer, tags=["send-message"])
-    def post(self, request, user_id):
-        PHOTO_PATH = request.data['photo']
-        serializer = SendPhotoSerializer(data = request.data, partial = True)
-        if serializer.is_valid():
-            bot = telegram.Bot(token=self.my_token)
-            bot.send_photo(chat_id=user_id, photo=PHOTO_PATH)
-            return Response({
-                "status": "success"
-            })
-        else:
-            return Response({'detail':'not found'})
+    def post(self, request):
+        serializer = SendPhotoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        bot = telegram.Bot(token=self.my_token)
+        bot.send_photo(chat_id=632179390, photo=request.data['photo'])
+        return Response({
+            "status": 'success'
+        })
 
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
@@ -689,3 +693,25 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
 
 
+class ReceivePhotoView(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = [FormParser, MultiPartParser]
+    
+    @swagger_auto_schema(request_body=SavePhotoSerializer)
+    def post(self, request):
+        serializer = SavePhotoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'photo_url': serializer.data['photo']})
+
+
+class ReceiveFileView(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = [FormParser, MultiPartParser]
+    
+    @swagger_auto_schema(request_body=SaveFileSerializer)
+    def post(self, request):
+        serializer = SaveFileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'file_url': serializer.data['file']})

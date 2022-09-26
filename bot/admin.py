@@ -1,5 +1,6 @@
 from django.contrib import admin
 from bot import models
+from django.utils.safestring import mark_safe
 
 
 @admin.register(models.SlaveBot)
@@ -44,6 +45,7 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'message',
         'message_id',
         'photo',
+        'file',
         'is_read',
     )
     list_editable = (
@@ -51,3 +53,18 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'operator',
         'slavebot'
     )
+@admin.register(models.File)
+class FileAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'operator',
+        'photo',
+        'file'
+    )
+    list_editable = (
+        'user', 
+        'operator'
+    )
+    def get_image(self, obj):
+        return mark_safe(f'<img src = {obj.photo.url} width = "120" height = "80">')

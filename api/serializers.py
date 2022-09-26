@@ -1,11 +1,15 @@
+from dataclasses import fields
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from bot.models import BotUser, SlaveBot, IncomingMessage, BlackList
+from bot.models import BotUser, SlaveBot, IncomingMessage, BlackList, File
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import password_validation
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import  force_str
 from rest_framework import serializers
 from accounts.models import Operators
+from django.utils.translation import gettext as _
+
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -60,13 +64,13 @@ class AddOperatorSerializer(serializers.ModelSerializer):
                 )
 
 
-class IncomingMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IncomingMessage
-        fields = (
-            'slavebot', 'user', 'answer',
-            'message_id', 'message', 'created_at'
-        )
+# class IncomingMessageSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = IncomingMessage
+#         fields = (
+#             'slavebot', 'user', 'answer',
+#             'message_id', 'message', 'created_at'
+#         )
 
 class ChatListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -84,6 +88,7 @@ class ChatListSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.chat_id
         return representation
 
+
 class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomingMessage
@@ -96,6 +101,7 @@ class ChatSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
         return representation
+
 
 class SearchSerializer(serializers.ModelSerializer):
     class Meta:
@@ -110,11 +116,13 @@ class SearchSerializer(serializers.ModelSerializer):
         representation['name'] = f'{instance.user.firstname} {instance.user.lastname}'
         return representation
 
+
 class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
         fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at')
+        
         # extra_kwargs = {
         #     'user': {
         #         'read_only': True
@@ -142,7 +150,6 @@ class SendMessageSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         validated_data['slavebot'] = slave_bot
         validated_data['operator'] = self.context
-        print("validated_data", validated_data)
         return super().create(validated_data)  
 
     def to_representation(self, instance):
@@ -154,10 +161,94 @@ class SendMessageSerializer(serializers.ModelSerializer):
         return representation
 
 
+class SavePhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = File
+        fields = ('id', 'user', 'operator', 'photo', 'created_at')
+
+
+class SaveFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = File
+        fields = ('id', 'user', 'operator', 'file', 'created_at')
+
+
 class SendPhotoSerializer(serializers.ModelSerializer):
+    chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('photo',)
+        fields = ('id', 'photo', 'slavebot', 'chat_id', 'created_at')
+
+        
+    def validate(self, attrs):
+        super().validate(attrs)
+
+        chat_id = attrs['chat_id']
+        slave_bot = self.context.slavebot
+
+        if not slave_bot:
+            raise serializers.ValidationError({'slavebot': 'slavebot not exist !'}) 
+        else:
+            bot_users = slave_bot.users.filter(chat_id=chat_id)
+            if not bot_users.exists():
+                raise serializers.ValidationError({'chat_id': "chat_id not exist !"})
+        return attrs
+    
+    def create(self, validated_data):
+        chat_id = validated_data.pop('chat_id')
+        slave_bot = self.context.slavebot
+        user = BotUser.objects.get(chat_id=chat_id)
+        validated_data['user'] = user
+        validated_data['slavebot'] = slave_bot
+        validated_data['operator'] = self.context
+        return super().create(validated_data) 
+
+    def to_representation(self, instance):
+        # unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
+        representation = super().to_representation(instance)
+        # representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
+        # representation['unread_count'] = unread_count
+        representation['user'] = instance.user.chat_id
+        return representation
+
+
+class SendFileSerializer(serializers.ModelSerializer):
+    chat_id = serializers.IntegerField(write_only=True)
+    class Meta:
+        model = IncomingMessage
+        fields = ('id', 'file', 'chat_id', 'slavebot', 'created_at')
+
+        
+    def validate(self, attrs):
+        super().validate(attrs)
+
+        chat_id = attrs['chat_id']
+        slave_bot = self.context.slavebot
+
+        if not slave_bot:
+            raise serializers.ValidationError({'slavebot': 'slavebot not exist !'}) 
+        else:
+            bot_users = slave_bot.users.filter(chat_id=chat_id)
+            if not bot_users.exists():
+                raise serializers.ValidationError({'chat_id': "chat_id not exist !"})
+        return attrs
+    
+    def create(self, validated_data):
+        chat_id = validated_data.pop('chat_id')
+        slave_bot = self.context.slavebot
+        user = BotUser.objects.get(chat_id=chat_id)
+        validated_data['user'] = user
+        validated_data['slavebot'] = slave_bot
+        validated_data['operator'] = self.context
+        return super().create(validated_data) 
+
+    def to_representation(self, instance):
+        # unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
+        representation = super().to_representation(instance)
+        # representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
+        # representation['unread_count'] = unread_count
+        representation['user'] = instance.user.chat_id
+        return representation
 
 
 class ChangePasswordSerializer(serializers.Serializer):

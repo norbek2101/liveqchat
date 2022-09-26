@@ -1,7 +1,10 @@
+from ast import operator
 from bot.utils.abstract import BaseModel
 from django.db import models
 
 from bot.utils.constants import STEP
+import os
+from django.core.exceptions import ValidationError
 
     
 # def upload_path(instance, filename):
@@ -59,19 +62,27 @@ class BotUser(BaseModel):
             return bot_user.step
         except self.DoesNotExist:
             return False
-    
+
+def validate_file_extension(value):
+        ext = os.path.splitext(value.name)[1]  # [0] returns path+filename
+        valid_extensions = ['.jpg', '.jpeg', '.png', '.svg']
+        if not ext.lower() in valid_extensions:
+            raise ValidationError('Unsupported file extension.')
+
 
 class IncomingMessage(BaseModel):
     user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name='messages', null= True)
     operator = models.ForeignKey('accounts.Operators', on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
     slavebot = models.ForeignKey(SlaveBot, on_delete=models.CASCADE, null=True, related_name='messages')
     reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replied_messages', null=True, blank=True)
-    message = models.CharField(max_length=10000, null=True)
+    message = models.CharField(max_length=5000, null=True)
     message_id = models.BigIntegerField('botdan yozilgan xabar IDsi', null=True, blank=True)
-    photo = models.ImageField(null=True, blank=True)
+    # photo = models.ImageField(null=True, blank=True, validators=[validate_file_extension])
+    photo = models.CharField(max_length=300, null=True)
+    file = models.CharField(max_length=300, null=True, blank=True)
     is_read = models.BooleanField(default=False)
     is_sent = models.BooleanField(default=False)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -81,7 +92,7 @@ class IncomingMessage(BaseModel):
     class Meta:
         verbose_name = "Kiruvchi sms"
         verbose_name_plural = "Kiruvchi smslar"
-
+    
 
 class BlackList(BaseModel):
     user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name="blacklist")
@@ -96,3 +107,16 @@ class BlackList(BaseModel):
         verbose_name = "Qora ro'yhat"
         verbose_name_plural = "Qora ro'yhat"
 
+class File(BaseModel):
+    user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name="photos")
+    operator = models.ForeignKey('accounts.Operators', on_delete=models.CASCADE, related_name='photos', null=True, blank=True)
+    photo = models.ImageField(null=True, blank=True)
+    file = models.FileField(null=True, blank=True)
+    
+    
+    def __str__(self):
+         return f'{self.user.chat_id} {self.operator}'
+
+    class Meta:
+        verbose_name = "Fayl"
+        verbose_name_plural = "Fayllar"

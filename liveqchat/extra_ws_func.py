@@ -1,3 +1,5 @@
+from fileinput import filename
+import os
 import math
 import telegram
 from django.utils import timezone
@@ -7,14 +9,13 @@ from bot.models import BotUser, IncomingMessage, SlaveBot
 from accounts.models import Operators
 from api.serializers import (
                             ChatSerializer, SearchSerializer, 
-                            ChatListSerializer, SendMessageSerializer
+                            ChatListSerializer, SendFileSerializer, SendMessageSerializer, SendPhotoSerializer
                             )
 
 
 def remove_duplicate(q_set):
     my_list = []
     user_ids = list(set(q_set.values_list("user__id", flat=True)))
-    print("user ids", user_ids)
     for i in q_set:
         if i.user_id in user_ids:
            my_list.append(i)
@@ -67,7 +68,7 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=10):
 
 
 @sync_to_async
-def send_msg_to_user(self, content, user):
+def send_msg_to_user(content, user):
     serializer = SendMessageSerializer(data=content, context=user)
     if serializer.is_valid():
         serializer.save()
@@ -75,24 +76,74 @@ def send_msg_to_user(self, content, user):
         incmsg.is_read = True
         incmsg.save()
         botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
+        send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
         return serializer.data
-        # return {
-        #         "id": serializer.data["id"],
-        #         "user": serializer.data['user'],
-        #         "message": serializer.data["message"],
-        #         "created_at":serializer.data["created_at"],
-        #         "slavebot": serializer.data["slavebot"]
-        #         }
     else:
         return serializer.errors  
 
-def send_msg_to_bot(self, msg, chat_id, token):
-        bot = telegram.Bot(token=token)
-        bot.sendMessage(chat_id=chat_id, text=msg)
+def send_msg_to_bot(msg, chat_id, token):
+    bot = telegram.Bot(token=token)
+    bot.sendMessage(chat_id=chat_id, text=msg)
 
 
+@sync_to_async
+def send_photo_to_user(content, user):
+    serializer = SendPhotoSerializer(data=content, context=user)
+    if serializer.is_valid():
+        serializer.save()
+        incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
+        incmsg.is_read = True
+        incmsg.save()
+        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        send_photo_to_bot(serializer.data['photo'], botuser.chat_id, token=incmsg.slavebot.token)
+        return serializer.data
+    else:
+        return serializer.errors  
 
+
+def send_photo_to_bot(PHOTO_PATH, chat_id, token):
+    bot = telegram.Bot(token=token)
+    bot.sendPhoto(chat_id=chat_id, photo=open(os.getcwd()+PHOTO_PATH, "rb"))
+
+
+@sync_to_async
+def send_video_to_user(content, user):
+    serializer = SendFileSerializer(data=content, context=user)
+    if serializer.is_valid():
+        serializer.save()
+        incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
+        incmsg.is_read = True
+        incmsg.save()
+        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        send_video_to_bot(serializer.data['file'], botuser.chat_id, token=incmsg.slavebot.token)
+        return serializer.data
+    else:
+        return serializer.errors  
+
+
+def send_video_to_bot(_file, chat_id, token):
+    bot = telegram.Bot(token=token)
+    bot.sendVideo(chat_id=chat_id, video=_file, supports_streaming=True)
+
+
+@sync_to_async
+def send_voice_to_user(content, user):
+    serializer = SendFileSerializer(data=content, context=user)
+    if serializer.is_valid():
+        serializer.save()
+        incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
+        incmsg.is_read = True
+        incmsg.save()
+        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        send_voice_to_bot(serializer.data['file'], botuser.chat_id, token=incmsg.slavebot.token)
+        return serializer.data
+    else:
+        return serializer.errors    
+
+
+def send_voice_to_bot(_file, chat_id, token):
+    bot = telegram.Bot(token=token)
+    bot.sendVoice(chat_id=chat_id, voice=_file)
 
 @sync_to_async
 def get_bot_id(user):
