@@ -112,8 +112,10 @@ class SearchSerializer(serializers.ModelSerializer):
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}}
 
     def to_representation(self, instance):
+        unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
         representation = super().to_representation(instance)
         representation['name'] = f'{instance.user.firstname} {instance.user.lastname}'
+        representation['unread_count'] = unread_count
         return representation
 
 
