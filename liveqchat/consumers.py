@@ -58,7 +58,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif action == 'send-message':
 
             result = await send_msg_to_user(content, operator)
-            print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -69,7 +68,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             
         elif action == 'send-photo':
             result = await send_photo_to_user(content, operator)
-            print("result pp", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -80,7 +78,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         elif action == 'send-voice':
             result = await send_voice_to_user(content, operator)
-            print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -91,7 +88,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
         elif action == 'send-video':
             result = await send_video_to_user(content, operator)
-            print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -142,7 +138,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return await self.send_json({"errors": {"message_id": 'This field is required!'}})
             
             result = await mark_as_read_chat_to_messages(user_id, bot_id, message_id)
-            print("result",result)
     
             return await self.send_data({"data": result})          
 

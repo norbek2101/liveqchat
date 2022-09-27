@@ -1,3 +1,4 @@
+from ast import operator
 from fileinput import filename
 import os
 import math
@@ -46,8 +47,9 @@ def get_all_msg_from_db(operator_id):
 
 
 @sync_to_async
-def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=10):
-    messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id)
+def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
+    messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id).order_by("-created_at")
+    
     
     if page*page_size > messages.count():
         return False
@@ -79,10 +81,14 @@ def send_msg_to_user(content, user):
         incmsg.is_read = True
         incmsg.save()
         botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        bot = telegram.Bot(token=incmsg.slavebot.token)
-        bot.sendMessage(chat_id=botuser.chat_id, text=serializer.data['message'])
-        # self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
-        return serializer.data
+        send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
+
+        messages = IncomingMessage.objects.filter(operator=incmsg.operator,
+                    user__chat_id=serializer.data['user'],
+                    slavebot=incmsg.slavebot.id).order_by("-created_at")
+        
+        serializer1 = SendMessageSerializer(messages, many=True)
+        return {"messages": serializer1.data[:15]}
     else:
         return serializer.errors  
 

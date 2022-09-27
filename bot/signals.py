@@ -50,10 +50,10 @@ def slavebot_delete_handler(sender, instance: SlaveBot, **kwargs):
         pass
 
 
-@receiver(post_save, sender=IncomingMessage)
-def msg_created(sender, instance: IncomingMessage, created, **kwargs):
-    if created:
-        if instance.is_sent:
-            print("signals.py")
-            return False
-        send_to_operator(instance, lg)
+# @receiver(post_save, sender=IncomingMessage)
+# def msg_created(sender, instance: IncomingMessage, created, **kwargs):
+#     if created:
+#         if instance.is_sent:
+#             return False
+#         print("signals.py")
+#         send_to_operator(instance, lg)
