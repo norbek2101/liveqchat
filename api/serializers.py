@@ -93,9 +93,9 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomingMessage
         fields = (
-            'id', 'message', 'created_at', 'user'
+            'id', 'message', 'created_at', 'user', 'message_id'
         )
-        extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}}
+        extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}, 'message_id': {'read_only': True}}
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -123,13 +123,13 @@ class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at')
+        fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at', 'message_id')
         
-        # extra_kwargs = {
-        #     'user': {
-        #         'read_only': True
-        #     }
-        # }
+        extra_kwargs = {
+            'message_id': {
+                'read_only': True
+            }
+        }
         
     def validate(self, attrs):
         super().validate(attrs)
@@ -179,8 +179,13 @@ class SendPhotoSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'photo', 'slavebot', 'chat_id', 'created_at')
+        fields = ('id', 'photo', 'slavebot', 'chat_id', 'created_at', 'message_id')
 
+        extra_kwargs = {
+                'message_id': {
+                    'read_only': True
+                }
+            }
         
     def validate(self, attrs):
         super().validate(attrs)
@@ -218,8 +223,13 @@ class SendFileSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'file', 'chat_id', 'slavebot', 'created_at')
+        fields = ('id', 'file', 'chat_id', 'slavebot', 'created_at', 'message_id')
 
+        extra_kwargs = {
+            'message_id': {
+                'read_only': True
+            }
+        }
         
     def validate(self, attrs):
         super().validate(attrs)

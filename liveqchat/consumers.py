@@ -106,7 +106,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             page_size = content.pop('page_size', False)
             user_id = content.pop('user_id', False)
             bot_id = await get_bot_id(operator)
-            result = await filter_msg_by_user(user_id, bot_id,operator, page, page_size)
+            result = await filter_msg_by_user(user_id, bot_id, operator, page, page_size)
 
             if not result:
                 return await self.send_data("Page Not Found !")
@@ -167,9 +167,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         finally:
             return await super().disconnect(code)
 
-    # def send_msg_to_bot(msg, chat_id, token):
-    #     bot = telegram.Bot(token=token)
-    #     bot.sendMessage(chat_id=chat_id, text=msg)
+    def send_msg_to_bot(msg, chat_id, token):
+        bot = telegram.Bot(token=token)
+        bot.sendMessage(chat_id=chat_id, text=msg)
 
 
     # def send_video_to_bot(_file, chat_id, token):

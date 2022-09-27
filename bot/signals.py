@@ -54,5 +54,6 @@ def slavebot_delete_handler(sender, instance: SlaveBot, **kwargs):
 def msg_created(sender, instance: IncomingMessage, created, **kwargs):
     if created:
         if instance.is_sent:
+            print("signals.py")
             return False
         send_to_operator(instance, lg)

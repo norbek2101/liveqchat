@@ -226,6 +226,7 @@ def initializer_message_handlers(_: TeleBot):
         )
         try:
             send_to_operator(inc_msg, logger)
+            print("messages.py")
         except Exception as e:
             logger.warning(e)
 

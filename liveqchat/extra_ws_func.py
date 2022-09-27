@@ -52,7 +52,10 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=10):
     if page*page_size > messages.count():
         return False
     
-    pag_msg = messages[page*page_size-page_size:page*page_size]
+    
+    pag_msg = messages[page_size*(page-page):page*page_size]
+    
+    
     if page_size != 0:
         total_pages = math.ceil(messages.count()/page_size)
         serializer = ChatSerializer(pag_msg, many=True)
@@ -76,7 +79,9 @@ def send_msg_to_user(content, user):
         incmsg.is_read = True
         incmsg.save()
         botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
+        bot = telegram.Bot(token=incmsg.slavebot.token)
+        bot.sendMessage(chat_id=botuser.chat_id, text=serializer.data['message'])
+        # self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
         return serializer.data
     else:
         return serializer.errors  

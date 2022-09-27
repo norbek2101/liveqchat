@@ -13,7 +13,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
         return False
     channel_layer = get_channel_layer()
     data = model_to_dict(instance)
-    message = data['message']
+    # message = data['message']
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
         is_active=True
@@ -41,12 +41,14 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             operator = offline_operator.first()
     if operator is not None:
         try:
+            print("extra func")
             instance.operator = operator
+            print("instance.operator", instance.operator)
             async_to_sync(
                 channel_layer.group_send)(
                                             f'operator_{operator.id}',
                                             {
-                                                'type': 'send.data',
+                                                'type': 'send_data',
                                                 'data': data
                                             }
                                         )
