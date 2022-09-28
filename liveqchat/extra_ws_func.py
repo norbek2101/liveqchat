@@ -55,7 +55,7 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
         return False
     
     
-    pag_msg = messages[page_size*(page-page):page*page_size]
+    pag_msg = messages[page_size*(page-1):page*page_size][::-1]
     
     
     if page_size != 0:

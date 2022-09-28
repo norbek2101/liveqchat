@@ -99,7 +99,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         elif action == 'get':
             page = content.pop('page', False)
-            page_size = content.pop('page_size', False)
+            page_size = 15
             user_id = content.pop('user_id', False)
             bot_id = await get_bot_id(operator)
             result = await filter_msg_by_user(user_id, bot_id, operator, page, page_size)
