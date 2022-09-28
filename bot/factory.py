@@ -31,7 +31,7 @@ def bot_initializer(token):
         #if not settings.BASE_URL:
         #    settings.BASE_URL = get_ngrok_url()
         BASE_URL = settings.WEBHOOK_URL
-        print(bot.set_webhook(f"{BASE_URL}/bot/{token}/"))
+        # print(bot.set_webhook(f"{BASE_URL}/bot/{token}/"))
         print(bot.set_my_commands([BotCommand(command['command'], command['description']) for command in SLAVE_BOT_COMMANDS]))
     
     initializer_message_handlers(bot)
