@@ -230,3 +230,41 @@ def initializer_message_handlers(_: TeleBot):
         except Exception as e:
             logger.warning(e)
 
+
+
+    @_.message_handler(
+        content_types=content_type_media,
+        func=lambda message: check_step(message, STEP.MAIN)
+        )
+    @auth
+    def photo_handler(message: types.Message, user: BotUser, bot: TeleBot = _):
+        print("message", message)
+        result = check_user(message.chat.id, bot)
+        if not result:
+            bot.send_message(
+                chat_id=message.chat.id,
+                text=Text.NOT_REGISTERED
+            )
+            return
+        bot.send_message(
+            chat_id=message.chat.id,
+            text="Xabaringiz operatorlarga jo'natildi"
+        )
+        # bot.forward_message(
+        #     chat_id=message.chat.id,
+        #     from_chat_id=632179390,
+        #     message_id=message.message_id
+        # )
+        # print("message_id", message.chat.id)
+        
+        inc_msg = IncomingMessage.objects.create(
+            user=user,
+            slavebot=user.slavebot,
+            photo=message.photo,
+            message_id=message.message_id,
+        )
+        try:
+            print("messages.py")
+            send_to_operator(inc_msg, logger)
+        except Exception as e:
+            logger.warning(e)
