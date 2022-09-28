@@ -199,7 +199,7 @@ def initializer_message_handlers(_: TeleBot):
         )
     @auth
     def message_handler(message: types.Message, user: BotUser, bot: TeleBot = _):
-        print("message", message)
+        print("message", message.photo)
         result = check_user(message.chat.id, bot)
         if not result:
             bot.send_message(
@@ -238,7 +238,7 @@ def initializer_message_handlers(_: TeleBot):
         )
     @auth
     def photo_handler(message: types.Message, user: BotUser, bot: TeleBot = _):
-        print("message", message)
+        print("message", message.photo)
         result = check_user(message.chat.id, bot)
         if not result:
             bot.send_message(
@@ -246,6 +246,11 @@ def initializer_message_handlers(_: TeleBot):
                 text=Text.NOT_REGISTERED
             )
             return
+        bot.send_photo(
+            chat_id=message.chat.id,
+            photo=message.photo
+        )
+
         bot.send_message(
             chat_id=message.chat.id,
             text="Xabaringiz operatorlarga jo'natildi"
