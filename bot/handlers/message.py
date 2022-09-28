@@ -1,5 +1,5 @@
 from bot.utils.extra import make_keyboards, slavebot_register_user
-from bot.models import BotUser, IncomingMessage, SlaveBot
+from bot.models import BotUser, File, IncomingMessage, SlaveBot
 from bot.utils.constants import Text, BtnText
 from telebot.util import content_type_media
 from bot.extra_func import send_to_operator
@@ -257,6 +257,10 @@ def initializer_message_handlers(_: TeleBot):
         # )
         # print("message_id", message.chat.id)
         
+        inc_file = File.objects.create(
+            user=user,
+            photo=message.photo
+        )
         inc_msg = IncomingMessage.objects.create(
             user=user,
             slavebot=user.slavebot,
@@ -266,5 +270,11 @@ def initializer_message_handlers(_: TeleBot):
         try:
             print("messages.py")
             send_to_operator(inc_msg, logger)
+        except Exception as e:
+            logger.warning(e)
+        
+        try:
+            print("messag.py")
+            send_to_operator(inc_file, logger)
         except Exception as e:
             logger.warning(e)
