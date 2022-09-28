@@ -62,11 +62,11 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
                 # if not from_chat_id.startswith('@'):
                 #     from_chat_id = '@' + from_chat_id
                 bot = TeleBot(instance.slavebot.token)
-                bot.forward_message(
-                    chat_id=632179390,
-                    from_chat_id=632179390,
-                    message_id=instance.message_id,
-                )
+                # bot.forward_message(
+                #     chat_id=632179390,
+                #     from_chat_id=632179390,
+                #     message_id=instance.message_id,
+                # )
             instance.is_sent = True
         except Exception as e:
             print(e)
