@@ -88,7 +88,7 @@ def send_msg_to_user(content, user):
                     slavebot=incmsg.slavebot.id).order_by("-created_at")
         
         serializer1 = SendMessageSerializer(messages, many=True)
-        return {"messages": serializer1.data[:15]}
+        return {"messages": serializer1.data[:15][::-1]}
     else:
         return serializer.errors  
 
