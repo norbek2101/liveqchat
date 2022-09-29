@@ -96,6 +96,7 @@ def send_msg_to_user(content, user):
     else:
         return serializer.errors  
 
+
 def send_msg_to_bot(msg, chat_id, token):
     bot = telegram.Bot(token=token)
     bot.sendMessage(chat_id=chat_id, text=msg)
