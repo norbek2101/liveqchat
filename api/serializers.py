@@ -141,6 +141,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'slavebot': 'slavebot not exist !'}) 
         else:
             bot_users = slave_bot.users.filter(chat_id=chat_id)
+            print("bot_users", bot_users)
             if not bot_users.exists():
                 raise serializers.ValidationError({'chat_id': "chat_id not exist !"})
         return attrs

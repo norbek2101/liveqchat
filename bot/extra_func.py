@@ -6,6 +6,7 @@ from asgiref.sync import async_to_sync
 from django.db.models import Count, Q
 from telebot import TeleBot
 from loguru import logger as lg
+from api.serializers import SendMessageSerializer
 
 
 def send_to_operator(instance: IncomingMessage, logger: lg):

@@ -211,12 +211,12 @@ def initializer_message_handlers(_: TeleBot):
             chat_id=message.chat.id,
             text="Xabaringiz operatorlarga jo'natildi"
         )
-        # bot.forward_message(
-        #     chat_id=message.chat.id,
-        #     from_chat_id=632179390,
-        #     message_id=message.message_id
-        # )
-        # print("message_id", message.chat.id)
+        bot.forward_message(
+            chat_id=message.chat.id,
+            from_chat_id=632179390,
+            message_id=message.message_id
+        )
+        print("message_id", message.chat.id)
         
         inc_msg = IncomingMessage.objects.create(
             user=user,
