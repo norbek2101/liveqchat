@@ -55,7 +55,9 @@ class IncomingMesageAdmin(admin.ModelAdmin):
     list_editable = (
         'user', 
         'operator',
-        'slavebot'
+        'slavebot',
+	'from_user',
+	'from_operator'
     )
 @admin.register(models.File)
 class FileAdmin(admin.ModelAdmin):
