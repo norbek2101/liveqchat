@@ -8,13 +8,12 @@ from telebot import TeleBot
 from loguru import logger as lg
 from api.serializers import SendMessageSerializer
 
-
-def send_to_operator(instance: IncomingMessage, logger: lg):
+def send_to_operator(instance: SendMessageSerializer, logger: lg):
     if instance.is_sent:
         return False
     channel_layer = get_channel_layer()
     data = model_to_dict(instance)
-    # message = data['message']
+    message = data['message']
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
         is_active=True
@@ -50,7 +49,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
                                             f'operator_{operator.id}',
                                             {
                                                 'type': 'send_data',
-                                                'data': data
+                                                'data':  data
                                             }
                                         )
             instance.is_sent = True
