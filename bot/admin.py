@@ -31,6 +31,7 @@ class BotUserAdmin(admin.ModelAdmin):
         'slavebot',
         'from_main_bot',
         'step',
+        'created_at'
     )
 
 
@@ -47,6 +48,9 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'photo',
         'file',
         'is_read',
+        'from_user',
+        'from_operator',
+        'created_at'
     )
     list_editable = (
         'user', 
@@ -60,7 +64,8 @@ class FileAdmin(admin.ModelAdmin):
         'user',
         'operator',
         'photo',
-        'file'
+        'file',
+        'created_at'
     )
     list_editable = (
         'user', 

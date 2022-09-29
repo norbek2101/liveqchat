@@ -93,7 +93,7 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomingMessage
         fields = (
-            'id', 'message', 'created_at', 'user', 'message_id'
+            'id', 'message', 'created_at', 'user', 'message_id', 'from_user', 'from_operator'
         )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}, 'message_id': {'read_only': True}}
 
@@ -123,7 +123,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at', 'message_id')
+        fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at', 'message_id', 'from_user', 'from_operator')
         
         extra_kwargs = {
             'message_id': {

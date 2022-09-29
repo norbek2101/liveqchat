@@ -223,6 +223,7 @@ def initializer_message_handlers(_: TeleBot):
             slavebot=user.slavebot,
             message=message.text,
             message_id=message.message_id,
+            from_user=True
         )
         try:
             print("messages.py")

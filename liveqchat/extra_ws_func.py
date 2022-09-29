@@ -55,7 +55,7 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
         return False
     
     
-    pag_msg = messages[page_size*(page-1):page*page_size][::-1]
+    pag_msg = messages[page_size*page-page_size:page*page_size]
     
     
     if page_size != 0:
@@ -68,7 +68,7 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
 
     return {
             "total_page": total_pages,
-            "result": serializer.data
+            "result": serializer.data[::-1]
            }
 
 
@@ -78,6 +78,7 @@ def send_msg_to_user(content, user):
     if serializer.is_valid():
         serializer.save()
         incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
+        incmsg.from_operator = True
         incmsg.is_read = True
         incmsg.save()
         botuser = BotUser.objects.get(chat_id=serializer.data['user'])

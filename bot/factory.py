@@ -15,30 +15,30 @@ from pyngrok import ngrok
 
 init = True
 
-def get_ngrok_url():
-    ngrok.set_auth_token(settings.NGROK_AUTHTOKEN)
-    https_tunnel = ngrok.connect(8000, bind_tls=True)
-    print(https_tunnel.public_url)
-    BASE_URL = https_tunnel.public_url
-    return BASE_URL
+# def get_ngrok_url():
+#     ngrok.set_auth_token(settings.NGROK_AUTHTOKEN)
+#     https_tunnel = ngrok.connect(8000, bind_tls=True)
+#     print(https_tunnel.public_url)
+#     BASE_URL = https_tunnel.public_url
+#     return BASE_URL
 
 
 def bot_initializer(token):
-    
-    bot: TeleBot = TeleBot(token, parse_mode='html')
+    ...
+    # bot: TeleBot = TeleBot(token, parse_mode='html')
 
-    if init:
-        #if not settings.BASE_URL:
-        #    settings.BASE_URL = get_ngrok_url()
-        BASE_URL = settings.WEBHOOK_URL
-        print(bot.set_webhook(f"{BASE_URL}/bot/{token}/"))
-        print(bot.set_my_commands([BotCommand(command['command'], command['description']) for command in SLAVE_BOT_COMMANDS]))
+    # if init:
+    #     #if not settings.BASE_URL:
+    #     #    settings.BASE_URL = get_ngrok_url()
+    #     BASE_URL = settings.WEBHOOK_URL
+    #     print(bot.set_webhook(f"{BASE_URL}/bot/{token}/"))
+    #     print(bot.set_my_commands([BotCommand(command['command'], command['description']) for command in SLAVE_BOT_COMMANDS]))
     
-    initializer_message_handlers(bot)
-    initializer_callback_query_handlers(bot)
-    initializer_inline_query_handlers(bot)
-    initializer_channel_post_handlers(bot)
-    initializer_pre_checkout_query_handlers(bot)
-    initializer_chosen_inline_result_handlers(bot)
+    # initializer_message_handlers(bot)
+    # initializer_callback_query_handlers(bot)
+    # initializer_inline_query_handlers(bot)
+    # initializer_channel_post_handlers(bot)
+    # initializer_pre_checkout_query_handlers(bot)
+    # initializer_chosen_inline_result_handlers(bot)
 
-    return bot
+    # return bot
