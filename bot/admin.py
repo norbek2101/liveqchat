@@ -56,8 +56,8 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'user', 
         'operator',
         'slavebot',
-	'from_user',
-	'from_operator'
+	    'from_user',
+	    'from_operator'
     )
 @admin.register(models.File)
 class FileAdmin(admin.ModelAdmin):

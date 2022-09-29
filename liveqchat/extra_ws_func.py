@@ -49,13 +49,13 @@ def get_all_msg_from_db(operator_id):
 @sync_to_async
 def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
     messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id).order_by("-created_at")
+    if not messages:
+        return {
+            "result": "Messages does not exist"
+            }
+        
+    pag_msg = messages[page_size*page-page_size:page*page_size][::-1]
     
-    
-    if page*page_size > messages.count():
-        return False
-    
-    
-    pag_msg = messages[page_size*page-page_size:page*page_size]
     
     
     if page_size != 0:
@@ -65,10 +65,13 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
     else:
         total_pages = ''
         serializer = ChatSerializer(messages, many=True)
-
+        
+    if page*page_size > messages.count():
+        serializer = ChatSerializer(pag_msg, many=True)
+        
     return {
             "total_page": total_pages,
-            "result": serializer.data[::-1]
+            "result": serializer.data
            }
 
 

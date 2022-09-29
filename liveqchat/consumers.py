@@ -99,14 +99,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         elif action == 'get':
             page = content.pop('page', False)
+            if not page:
+                return await self.send_data({"data": "Page Not Found !"})
             page_size = 15
             user_id = content.pop('user_id', False)
-            bot_id = await get_bot_id(operator)
-            result = await filter_msg_by_user(user_id, bot_id, operator, page, page_size)
+            bot_id = content.pop("bot_id", False)
 
-            if not result:
-                return await self.send_data("Page Not Found !")
-            return await self.send_data({"data": result})
+            return await self.send_data({"data": await filter_msg_by_user(user_id, bot_id, operator, page, page_size)})
         
         
         elif action == 'mark-as-read-chat':
