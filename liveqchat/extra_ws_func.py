@@ -243,8 +243,7 @@ def mark_as_read_chat_to_messages(user_id, bot_id, message_id):
         messages = IncomingMessage.objects.filter(user__chat_id=user_id, slavebot=bot_id, message_id__lte=message_id)
         
         if messages: 
-            messages.is_read = False
-            messages.update(is_read=False)
+            messages.update(is_read=True)
             
         return {'result': 'ok'}
     except Exception as e:

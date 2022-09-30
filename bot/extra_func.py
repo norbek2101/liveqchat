@@ -6,14 +6,28 @@ from asgiref.sync import async_to_sync
 from django.db.models import Count, Q
 from telebot import TeleBot
 from loguru import logger as lg
-from api.serializers import SendMessageSerializer
 
-def send_to_operator(instance: SendMessageSerializer, logger: lg):
+def send_to_operator(instance: IncomingMessage, logger: lg):
     if instance.is_sent:
         return False
     channel_layer = get_channel_layer()
     data = model_to_dict(instance)
-    message = data['message']
+    # _data = data['message']
+    print("data", data)
+    obj = {}
+    obj['id'] = data['id']
+    obj['message'] = data['message']
+    obj['slavebot'] = data['slavebot']
+    # obj['created_at'] = (data['created_at'])
+    obj['message_id'] = data['message_id']
+    obj['from_user'] = data['from_user']
+    obj['from_operator'] = data['from_operator']
+    # print('dict--------------', data)
+    # di = {}
+    # di['id'] = data['id']
+    # di['message'] = data['message']
+    # print('======', di)x
+    # message = obj
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
         is_active=True

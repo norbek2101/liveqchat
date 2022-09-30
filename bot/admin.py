@@ -50,7 +50,8 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'is_read',
         'from_user',
         'from_operator',
-        'created_at'
+        'created_at',
+        'updated_at'
     )
     list_editable = (
         'user', 
