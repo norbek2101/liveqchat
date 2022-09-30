@@ -139,7 +139,7 @@ def send_video_to_user(content, user):
 
 def send_video_to_bot(_file, chat_id, token):
     bot = telegram.Bot(token=token)
-    bot.sendVideo(chat_id=chat_id, video=_file, supports_streaming=True)
+    bot.sendVideo(chat_id=chat_id, video=open(os.getcwd()+_file, "rb"))
 
 
 @sync_to_async
@@ -158,8 +158,9 @@ def send_voice_to_user(content, user):
 
 
 def send_voice_to_bot(_file, chat_id, token):
+    print("_file", _file)
     bot = telegram.Bot(token=token)
-    bot.sendVoice(chat_id=chat_id, voice=_file)
+    bot.send_voice(chat_id=chat_id, voice=_file)
 
 @sync_to_async
 def get_bot_id(user):
