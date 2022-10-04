@@ -1,5 +1,5 @@
 from bot.utils.extra import make_keyboards, slavebot_register_user
-from bot.models import BotUser, IncomingMessage, SlaveBot
+from bot.models import BotUser, File, IncomingMessage, SlaveBot
 from bot.utils.constants import Text, BtnText
 from telebot.util import content_type_media
 from bot.extra_func import send_to_operator
@@ -199,7 +199,8 @@ def initializer_message_handlers(_: TeleBot):
         )
     @auth
     def message_handler(message: types.Message, user: BotUser, bot: TeleBot = _):
-        print("message", message)
+        # print("message", message)
+
         result = check_user(message.chat.id, bot)
         if not result:
             bot.send_message(
@@ -207,26 +208,37 @@ def initializer_message_handlers(_: TeleBot):
                 text=Text.NOT_REGISTERED
             )
             return
+        
+        # raw = message.photo[2].file_id
+        # print("raw", raw)
+        # path = 'liveqchat/media/'+ raw + ".jpg"
+        # print("path", path)
+        # file_info = bot.get_file(raw)
+        # print("file info", file_info)
+        # downloaded_file = bot.download_file(file_info.file_path)
+        # with open(path,'wb') as new_file:
+        #     new_file.write(downloaded_file)
+            
         bot.send_message(
             chat_id=message.chat.id,
             text="Xabaringiz operatorlarga jo'natildi"
         )
-        # bot.forward_message(
-        #     chat_id=message.chat.id,
-        #     from_chat_id=632179390,
-        #     message_id=message.message_id
+        # inc_photo = File.objects.create(
+        #     user=user,
+        #     photo=downloaded_file
         # )
-        # print("message_id", message.chat.id)
-        
+        # print("inc_photo", inc_photo)
         inc_msg = IncomingMessage.objects.create(
             user=user,
             slavebot=user.slavebot,
             message=message.text,
             message_id=message.message_id,
+            from_user=True
         )
+        
         try:
+            # print("messages.py")
             send_to_operator(inc_msg, logger)
-            print("messages.py")
         except Exception as e:
             logger.warning(e)
 

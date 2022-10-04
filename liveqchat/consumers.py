@@ -58,7 +58,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif action == 'send-message':
 
             result = await send_msg_to_user(content, operator)
-            print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -69,7 +68,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             
         elif action == 'send-photo':
             result = await send_photo_to_user(content, operator)
-            print("result pp", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -80,7 +78,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         elif action == 'send-voice':
             result = await send_voice_to_user(content, operator)
-            print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -91,7 +88,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
         elif action == 'send-video':
             result = await send_video_to_user(content, operator)
-            print("result", result)
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -103,14 +99,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         elif action == 'get':
             page = content.pop('page', False)
-            page_size = content.pop('page_size', False)
+            if not page:
+                return await self.send_data({"data": "Page Not Found !"})
+            page_size = 15
             user_id = content.pop('user_id', False)
-            bot_id = await get_bot_id(operator)
-            result = await filter_msg_by_user(user_id, bot_id, operator, page, page_size)
+            bot_id = content.pop("bot_id", False)
 
-            if not result:
-                return await self.send_data("Page Not Found !")
-            return await self.send_data({"data": result})
+            return await self.send_data({"data": await filter_msg_by_user(user_id, bot_id, operator, page, page_size)})
         
         
         elif action == 'mark-as-read-chat':
@@ -142,7 +137,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return await self.send_json({"errors": {"message_id": 'This field is required!'}})
             
             result = await mark_as_read_chat_to_messages(user_id, bot_id, message_id)
-            print("result",result)
     
             return await self.send_data({"data": result})          
 

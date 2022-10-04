@@ -68,6 +68,7 @@ INSTALLED_APPS = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
     "https://liveqchat.m1.uz",
+    "https://liveqchat-front.m1.uz",
 ]
 
 MIDDLEWARE = [

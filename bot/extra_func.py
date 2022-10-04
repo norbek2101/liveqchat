@@ -7,13 +7,27 @@ from django.db.models import Count, Q
 from telebot import TeleBot
 from loguru import logger as lg
 
-
 def send_to_operator(instance: IncomingMessage, logger: lg):
     if instance.is_sent:
         return False
     channel_layer = get_channel_layer()
     data = model_to_dict(instance)
-    # message = data['message']
+    # _data = data['message']
+    print("data", data)
+    obj = {}
+    obj['id'] = data['id']
+    obj['message'] = data['message']
+    obj['slavebot'] = data['slavebot']
+    # obj['created_at'] = (data['created_at'])
+    obj['message_id'] = data['message_id']
+    obj['from_user'] = data['from_user']
+    obj['from_operator'] = data['from_operator']
+    # print('dict--------------', data)
+    # di = {}
+    # di['id'] = data['id']
+    # di['message'] = data['message']
+    # print('======', di)x
+    # message = obj
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
         is_active=True
@@ -49,7 +63,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
                                             f'operator_{operator.id}',
                                             {
                                                 'type': 'send_data',
-                                                'data': data
+                                                'data':  data
                                             }
                                         )
             instance.is_sent = True
@@ -62,11 +76,11 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
                 # if not from_chat_id.startswith('@'):
                 #     from_chat_id = '@' + from_chat_id
                 bot = TeleBot(instance.slavebot.token)
-                bot.forward_message(
-                    chat_id=632179390,
-                    from_chat_id=632179390,
-                    message_id=instance.message_id,
-                )
+                # bot.forward_message(
+                #     chat_id=632179390,
+                #     from_chat_id=632179390,
+                #     message_id=instance.message_id,
+                # )
             instance.is_sent = True
         except Exception as e:
             print(e)

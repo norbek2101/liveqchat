@@ -1,3 +1,4 @@
+from ast import operator
 from fileinput import filename
 import os
 import math
@@ -46,14 +47,15 @@ def get_all_msg_from_db(operator_id):
 
 
 @sync_to_async
-def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=10):
-    messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id)
+def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
+    messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id).order_by("-created_at")
+    if not messages:
+        return {
+            "result": "Messages does not exist"
+            }
+        
+    pag_msg = messages[page_size*page-page_size:page*page_size][::-1]
     
-    if page*page_size > messages.count():
-        return False
-    
-    
-    pag_msg = messages[page_size*(page-page):page*page_size]
     
     
     if page_size != 0:
@@ -63,7 +65,10 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=10):
     else:
         total_pages = ''
         serializer = ChatSerializer(messages, many=True)
-
+        
+    if page*page_size > messages.count():
+        serializer = ChatSerializer(pag_msg, many=True)
+        
     return {
             "total_page": total_pages,
             "result": serializer.data
@@ -76,15 +81,21 @@ def send_msg_to_user(content, user):
     if serializer.is_valid():
         serializer.save()
         incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
+        incmsg.from_operator = True
         incmsg.is_read = True
         incmsg.save()
         botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        bot = telegram.Bot(token=incmsg.slavebot.token)
-        bot.sendMessage(chat_id=botuser.chat_id, text=serializer.data['message'])
-        # self.send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
-        return serializer.data
+        send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
+
+        messages = IncomingMessage.objects.filter(operator=incmsg.operator,
+                    user__chat_id=serializer.data['user'],
+                    slavebot=incmsg.slavebot.id).order_by("-created_at")
+        
+        serializer1 = SendMessageSerializer(messages, many=True)
+        return {"messages": serializer1.data[:15][::-1]}
     else:
         return serializer.errors  
+
 
 def send_msg_to_bot(msg, chat_id, token):
     bot = telegram.Bot(token=token)
@@ -128,7 +139,7 @@ def send_video_to_user(content, user):
 
 def send_video_to_bot(_file, chat_id, token):
     bot = telegram.Bot(token=token)
-    bot.sendVideo(chat_id=chat_id, video=_file, supports_streaming=True)
+    bot.sendVideo(chat_id=chat_id, video=open(os.getcwd()+_file, "rb"))
 
 
 @sync_to_async
@@ -147,8 +158,9 @@ def send_voice_to_user(content, user):
 
 
 def send_voice_to_bot(_file, chat_id, token):
+    print("_file", _file)
     bot = telegram.Bot(token=token)
-    bot.sendVoice(chat_id=chat_id, voice=_file)
+    bot.send_voice(chat_id=chat_id, voice=_file)
 
 @sync_to_async
 def get_bot_id(user):
@@ -232,8 +244,7 @@ def mark_as_read_chat_to_messages(user_id, bot_id, message_id):
         messages = IncomingMessage.objects.filter(user__chat_id=user_id, slavebot=bot_id, message_id__lte=message_id)
         
         if messages: 
-            messages.is_read = False
-            messages.update(is_read=False)
+            messages.update(is_read=True)
             
         return {'result': 'ok'}
     except Exception as e:
