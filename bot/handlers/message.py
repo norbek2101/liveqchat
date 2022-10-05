@@ -252,6 +252,10 @@ def initializer_message_handlers(_: TeleBot):
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
                 
+                File.objects.create(
+                    user=user,
+                    photo=downloaded_file
+                )
                 
                 inc_msg = IncomingMessage.objects.create(
                     user=user,

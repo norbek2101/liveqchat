@@ -67,6 +67,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             )
             
         elif action == 'send-photo':
+            photo = content.pop("photo", False)
+        
+            if not photo:
+                return await self.send_json({"errors": {"photo": 'This field is required!'}})
+            
             result = await send_photo_to_user(content, operator)
             return await self.channel_layer.group_send(
                 self.room_group_name,
@@ -165,10 +170,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         bot = telegram.Bot(token=token)
         bot.sendMessage(chat_id=chat_id, text=msg)
 
-
-    # def send_video_to_bot(_file, chat_id, token):
-    #     bot = telegram.Bot(token=token)
-    #     bot.sendVideo(chat_id=chat_id, video=_file, supports_streaming=True)
 
 
 class SearchConsumer(AsyncJsonWebsocketConsumer):
