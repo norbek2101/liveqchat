@@ -199,7 +199,6 @@ def initializer_message_handlers(_: TeleBot):
         )
     @auth
     def message_handler(message: types.Message, user: BotUser, bot: TeleBot = _):
-        print("message", message.photo[-1])
 
         result = check_user(message.chat.id, bot)
         if not result:
