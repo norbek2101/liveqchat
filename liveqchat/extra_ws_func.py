@@ -1,16 +1,14 @@
-from ast import operator
-from fileinput import filename
 import os
 import math
 import telegram
 from django.utils import timezone
 from django.db.models import Q
 from asgiref.sync import sync_to_async
-from bot.models import BotUser, IncomingMessage, SlaveBot
+from bot.models import BotUser, IncomingMessage
 from accounts.models import Operators
 from api.serializers import (
-                            ChatSerializer, SearchSerializer, 
-                            ChatListSerializer, SendFileSerializer, SendMessageSerializer, SendPhotoSerializer
+                            ChatSerializer, SearchSerializer, SendMessageSerializer,
+                            ChatListSerializer, SendFileSerializer, SendPhotoSerializer
                             )
 
 
@@ -51,11 +49,10 @@ def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
     messages = IncomingMessage.objects.filter(operator=operator, user__chat_id=user_id, slavebot=bot_id).order_by("-created_at")
     if not messages:
         return {
-            "result": "Messages does not exist"
+            "result": "Messages not exist"
             }
         
-    pag_msg = messages[page_size*page-page_size:page*page_size][::-1]
-    
+    pag_msg = messages[page_size*page-page_size:page*page_size][::-1]  
     
     
     if page_size != 0:
@@ -160,48 +157,8 @@ def send_voice_to_user(content, user):
 def send_voice_to_bot(_file, chat_id, token):
     print("_file", _file)
     bot = telegram.Bot(token=token)
-    bot.send_voice(chat_id=chat_id, voice=_file)
+    bot.send_voice(chat_id=chat_id, voice=open(os.getcwd()+_file, "rb"))
 
-@sync_to_async
-def get_bot_id(user):
-    bot_id = SlaveBot.objects.get(id=user.slavebot.id)
-    return bot_id
-
-
-@sync_to_async
-def get_all_msg_list():
-    messages = IncomingMessage.objects.order_by("-created_at")
-    msg_duplicate = remove_duplicate(messages)
-    serializer = ChatListSerializer(msg_duplicate, many=True)
-    return serializer.data
-
-
-@sync_to_async
-def create_operator_connection_id(operator_id, connection_id):
-    pass
-    # TODO operator connectionni to'girlash(o'chirib operators modeli bn ishlash) kerak
-    # operator_create = OperatorConnection.objects.get_or_create(
-    #                 operator_id=operator_id, connection_id=connection_id,
-    #                 is_online=True)
-    # return operator_create
-
-@sync_to_async
-def discard_operator_connection_id(operator_id):
-    pass
-    # TODO operator connectionni to'girlash(o'chirib operators modeli bn ishlash) kerak
-    # operator_discards = OperatorConnection.objects.filter(operator_id=operator_id)
-    # for operator_discard in operator_discards:
-    #     operator_discard.delete()
-    # return operator_discard
-
-@sync_to_async
-def online_operators():
-    pass
-    # TODO operator connectionni to'girlash(o'chirib operators modeli bn ishlash) kerak
-    # online_opers = OperatorConnection.objects.filter(is_online=True)
-    # serializer = OperatorConnectionSerializer(online_opers, many=True)
-    # # print("online_opers", online_opers)
-    # return serializer.data
 
 @sync_to_async
 def set_online_date_operator(operator_id):

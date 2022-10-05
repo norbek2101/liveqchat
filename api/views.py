@@ -520,7 +520,8 @@ class Statistics(APIView):
                                                     created_at__gte=timezone.now().replace(hour=i,minute=0,second=0,microsecond=0),
                                                     created_at__lte=timezone.now().replace(hour=i,minute=59,second=59,microsecond=59)
                                                     ).count() for i in range(24) 
-                                   ]}
+                                   ]
+                }
         # operator_id = Operators.objects.filter(id=request.user.id)\
         #               .values_list("operator_id", flat=True)[0]
         # print("operator_id", operator_id)
@@ -660,7 +661,6 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
         else:
             return Response({'failed': 'This email does not exist!'}, status=status.HTTP_404_NOT_FOUND)
             
-
 
 class PasswordTokenCheckAPI(generics.GenericAPIView):
     permission_classes = [AllowAny]

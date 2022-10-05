@@ -18,16 +18,12 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
     obj['id'] = data['id']
     obj['message'] = data['message']
     obj['slavebot'] = data['slavebot']
-    # obj['created_at'] = (data['created_at'])
     obj['message_id'] = data['message_id']
     obj['from_user'] = data['from_user']
     obj['from_operator'] = data['from_operator']
+    #obj['created_at'] = (data['created_at'])
     # print('dict--------------', data)
-    # di = {}
-    # di['id'] = data['id']
-    # di['message'] = data['message']
-    # print('======', di)x
-    # message = obj
+    
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
         is_active=True

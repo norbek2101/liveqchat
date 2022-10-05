@@ -6,8 +6,8 @@ from json.decoder import JSONDecodeError
 from requests import Response
 from bot.models import BotUser
 from liveqchat.extra_ws_func import (
-                            get_all_msg_list, get_search_message, get_all_msg_from_db,
-                            get_bot_id, send_photo_to_user, send_video_to_user, send_voice_to_user, set_offline_status, set_online_date_operator,
+                            get_search_message, get_all_msg_from_db,
+                            send_photo_to_user, send_video_to_user, send_voice_to_user, set_offline_status, set_online_date_operator,
                             filter_msg_by_user, mark_as_read_chat_messages, 
                             mark_as_read_chat_to_messages, send_msg_to_user, 
                             )

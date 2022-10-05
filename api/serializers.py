@@ -212,10 +212,10 @@ class SendPhotoSerializer(serializers.ModelSerializer):
         return super().create(validated_data) 
 
     def to_representation(self, instance):
-        # unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
+        unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
         representation = super().to_representation(instance)
-        # representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
-        # representation['unread_count'] = unread_count
+        representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
+        representation['unread_count'] = unread_count
         representation['user'] = instance.user.chat_id
         return representation
 
@@ -256,10 +256,10 @@ class SendFileSerializer(serializers.ModelSerializer):
         return super().create(validated_data) 
 
     def to_representation(self, instance):
-        # unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
+        unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
         representation = super().to_representation(instance)
-        # representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
-        # representation['unread_count'] = unread_count
+        representation['name'] = f"{instance.user.firstname} {instance.user.lastname}"
+        representation['unread_count'] = unread_count
         representation['user'] = instance.user.chat_id
         return representation
 
@@ -293,7 +293,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 class BlackListSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlackList
-        fields = ('user', )
+        fields = ['user']
     
     def to_representation(self, instance):
         return {
@@ -339,9 +339,3 @@ class SetNewPasswordSerializer(serializers.Serializer):
         except Exception as e:
             raise AuthenticationFailed('The reset link is invalid', 401)
         return super().validate(attrs)
-
-
-class OperatorConnectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ... # OperatorConnection # bu model kerak emas
-        fields = ("id", "connection_id", "operator")
