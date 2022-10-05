@@ -13,6 +13,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import Operators
+
 from .app_settings import (
     JWTSerializer, JWTSerializerWithExpiration, LoginSerializer,
     PasswordChangeSerializer, PasswordResetConfirmSerializer,
@@ -112,6 +114,15 @@ class LoginView(GenericAPIView):
                 instance=self.token,
                 context=self.get_serializer_context(),
             )
+
+        user = Operators.objects.get(operator_id=self.user)
+
+        if user.is_operator == True:
+                serializer.data['user']['is_operator'] = True
+                serializer.data['user']['is_admin'] = False
+        elif user.is_admin == True:
+            serializer.data['user']['is_admin'] = True
+            serializer.data['user']['is_operator'] = False
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
