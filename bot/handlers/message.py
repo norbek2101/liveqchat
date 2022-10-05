@@ -208,8 +208,37 @@ def initializer_message_handlers(_: TeleBot):
             )
             return
         else:
-            if message.content_type == 'photo':
+            if message.content_type == 'document':
                 
+                file_name = message.document.file_name
+                path = 'media/'+file_name
+                file_info = bot.get_file(message.document.file_id)
+                downloaded_file = bot.download_file(file_info.file_path)
+                with open(path, 'wb') as new_file:
+                    new_file.write(downloaded_file)
+                    
+    
+                bot.send_message(
+                    chat_id=message.chat.id,
+                    text="Xabaringiz operatorlarga jo'natildi"
+                )
+                
+                
+                inc_msg = IncomingMessage.objects.create(
+                    user=user,
+                    slavebot=user.slavebot,
+                    file=path,
+                    message_id=message.message_id,
+                    from_user=True
+                )
+                try:
+                
+                    send_to_operator(inc_msg, logger)
+                except Exception as e:
+                    logger.warning(e)
+            
+            elif message.content_type == 'photo':
+            
                 raw = message.photo[-1].file_id
                 path = 'media/'+ raw + ".jpg"
                 file_info = bot.get_file(raw)
@@ -231,7 +260,6 @@ def initializer_message_handlers(_: TeleBot):
                     message_id=message.message_id,
                     from_user=True
                 )
-                
                 try:
                 
                     send_to_operator(inc_msg, logger)
@@ -253,6 +281,65 @@ def initializer_message_handlers(_: TeleBot):
                 )
                 
                 try:
+                    send_to_operator(inc_msg, logger)
+                except Exception as e:
+                    logger.warning(e)
+            
+            elif message.content_type == 'voice':
+                
+                _file_name = message.voice.file_id
+                path = 'media/'+_file_name + '.mp3'
+                file_info = bot.get_file(_file_name)
+                downloaded_file = bot.download_file(file_info.file_path)
+                with open(path, 'wb') as new_file:
+                    new_file.write(downloaded_file)
+                    
+    
+                bot.send_message(
+                    chat_id=message.chat.id,
+                    text="Xabaringiz operatorlarga jo'natildi"
+                )
+                
+                
+                inc_msg = IncomingMessage.objects.create(
+                    user=user,
+                    slavebot=user.slavebot,
+                    file=path,
+                    message_id=message.message_id,
+                    from_user=True
+                )
+                try:
+                
+                    send_to_operator(inc_msg, logger)
+                except Exception as e:
+                    logger.warning(e)
+            
+            elif message.content_type == 'video':
+                
+                _file_name = message.video.file_id
+                
+                path = 'media/'+ _file_name + '.mp4'
+                file_info = bot.get_file(_file_name)
+                downloaded_file = bot.download_file(file_info.file_path)
+                with open(path, 'wb') as new_file:
+                    new_file.write(downloaded_file)
+                    
+    
+                bot.send_message(
+                    chat_id=message.chat.id,
+                    text="Xabaringiz operatorlarga jo'natildi"
+                )
+                
+                
+                inc_msg = IncomingMessage.objects.create(
+                    user=user,
+                    slavebot=user.slavebot,
+                    file=path,
+                    message_id=message.message_id,
+                    from_user=True
+                )
+                try:
+                
                     send_to_operator(inc_msg, logger)
                 except Exception as e:
                     logger.warning(e)
