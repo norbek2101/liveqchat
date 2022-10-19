@@ -11,6 +11,7 @@ from django.conf import settings
 active_bots = SlaveBot.objects.filter(is_active=True)
 
 for bot in active_bots:
+    print(bot.token)
     bot: TeleBot = bot_initializer(bot.token)
     settings.BOTS[bot.token] = bot
 
