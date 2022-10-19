@@ -38,7 +38,7 @@ class BotUser(BaseModel):
     username = models.CharField("username", max_length=200, null=True)
     photo = models.ImageField(upload_to='botuser/', blank=True)
     email = models.EmailField(null=True, blank=True)
-    chat_id = models.PositiveIntegerField("chat owner id", null=True, blank=True)
+    chat_id = models.BigIntegerField("chat owner id", null=True, blank=True)
     phone_number = models.CharField(max_length=13, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     from_main_bot = models.BooleanField(default=False)

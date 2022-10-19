@@ -21,6 +21,7 @@ def remove_duplicate(q_set):
            user_ids.remove(i.user_id)
         else:
             break
+    print('--', my_list)
     return my_list
 
 
@@ -39,7 +40,9 @@ def get_search_message(search_key):
 @sync_to_async
 def get_all_msg_from_db(operator_id):
     messages = IncomingMessage.objects.filter(operator_id=operator_id).order_by("-created_at")
+    print("messages", messages)
     msg_duplicate = remove_duplicate(messages)
+    print("msg duplicate", msg_duplicate)
     serializer = ChatListSerializer(msg_duplicate, many=True)
     return serializer.data
 
@@ -116,7 +119,7 @@ def send_photo_to_user(content, user):
 
 def send_photo_to_bot(PHOTO_PATH, chat_id, token):
     bot = telegram.Bot(token=token)
-    bot.sendPhoto(chat_id=chat_id, photo=open(os.getcwd()+PHOTO_PATH, "rb"))
+    bot.sendPhoto(chat_id=chat_id, photo=open(os.getcwd() + PHOTO_PATH, "rb"))
 
 
 @sync_to_async
@@ -136,7 +139,7 @@ def send_video_to_user(content, user):
 
 def send_video_to_bot(_file, chat_id, token):
     bot = telegram.Bot(token=token)
-    bot.sendVideo(chat_id=chat_id, video=open(os.getcwd()+_file, "rb"))
+    bot.sendVideo(chat_id=chat_id, video=open(os.getcwd()+_file, "rb"), supports_streaming=True)
 
 
 @sync_to_async
