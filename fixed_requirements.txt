@@ -1,0 +1,16 @@
+channels
+loguru
+django-cors-headers
+django-filter
+django-debug-toolbar
+drf-yasg
+djangorestframework
+django
+django-jazzmin
+sentry-sdk
+python-dotenv
+pyTelegramBotAPI
+pyngrok
+djangorestframework-simplejwt
+pandas
+python-telegram-bot
