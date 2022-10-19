@@ -105,7 +105,6 @@ def slavebot_register_user(user: BotUser, bot: TeleBot):
     return True
 
 
-
 def check_token(token):
     new_bot = TeleBot(token)
     try:

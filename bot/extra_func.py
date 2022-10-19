@@ -1,6 +1,6 @@
 from channels.layers import get_channel_layer
 from accounts.models import Operators
-from bot.models import IncomingMessage
+from bot.models import IncomingMessage, BotUser
 from django.forms import model_to_dict
 from asgiref.sync import async_to_sync
 from django.db.models import Count, Q
@@ -12,18 +12,24 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
         return False
     channel_layer = get_channel_layer()
     data = model_to_dict(instance)
-    # _data = data['message']
-    print("data", data)
+    usr = BotUser.objects.get(id=data['user'])
     obj = {}
     obj['id'] = data['id']
     obj['message'] = data['message']
+    obj['photo'] = data['photo']
+    obj['file'] = data['file']
+    obj['photo'] = data['photo']
+    obj['user'] = data['user']
     obj['slavebot'] = data['slavebot']
     obj['message_id'] = data['message_id']
     obj['from_user'] = data['from_user']
     obj['from_operator'] = data['from_operator']
-    #obj['created_at'] = (data['created_at'])
-    # print('dict--------------', data)
-    
+    obj['from_user'] = data['from_user']
+    obj['is_read'] = data['is_read']
+    obj['is_sent'] = data['is_sent']
+    obj['name'] = f"{usr.firstname} {usr.lastname}"
+    obj['created_at'] = str(instance.created_at.strftime('%Y-%m-%d %H:%M:%S'))
+
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
         is_active=True
@@ -49,6 +55,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             operator = online_operators.first()
         else:
             operator = offline_operator.first()
+    
     if operator is not None:
         try:
             print("extra func")
@@ -59,7 +66,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
                                             f'operator_{operator.id}',
                                             {
                                                 'type': 'send_data',
-                                                'data':  data
+                                                'data':  obj
                                             }
                                         )
             instance.is_sent = True

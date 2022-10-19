@@ -18,7 +18,7 @@ print(settings.BOTS)
 
 @csrf_exempt
 def web_hook(request, token):
-     
+    print("working")
     bot: TeleBot = settings.BOTS.get(token, False)
     if bot:
         if request.headers.get('content-type') == 'application/json':
