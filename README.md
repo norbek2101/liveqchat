@@ -28,7 +28,7 @@ env\Scripts\activate
 
 ## Execute DataBase
 ```bash
-python manage.py makemigrations bot accounts
+python manage.py makemigrations accounts
 python manage.py migrate
 ```
 
