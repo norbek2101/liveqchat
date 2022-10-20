@@ -97,6 +97,7 @@ class ChatSerializer(serializers.ModelSerializer):
         model = IncomingMessage
         fields = (
             'id', 'message', 'operator' ,'created_at', 'user', 'message_id', 'from_user', 'from_operator'
+
         )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}, 'message_id': {'read_only': True}}
 

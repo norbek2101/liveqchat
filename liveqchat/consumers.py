@@ -301,10 +301,13 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
             
             try:
                 result = await get_all_msg_from_db(oper_id)
+                return await self.send_data({"data": result})   
+
             
             except Exception as e:
-                return False
-            return await self.send_data({"data": result})   
+                # return False
+                return await  self.send_json({"errors": str(e)})
+            # return await self.send_data({"data": result})   
                  
         else:
             return await  self.send_json({'errors': {"action": f"enter one of the following : {ACTIONS}"}})
