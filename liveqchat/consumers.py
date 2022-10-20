@@ -11,7 +11,7 @@ from liveqchat.extra_ws_func import (
                             filter_msg_by_user, mark_as_read_chat_messages, 
                             mark_as_read_chat_to_messages, send_msg_to_user, 
                             )
-
+from rest_framework_simplejwt.backends import TokenBackend
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
@@ -108,7 +108,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return await self.send_data({"data": "Page Not Found !"})
             page_size = 15
             user_id = content.pop('user_id', False)
+            operator = self.scope.get("user", False)
             bot_id = content.pop("bot_id", False)
+            print(operator)
 
             return await self.send_data({"data": await filter_msg_by_user(user_id, bot_id, operator, page, page_size)})
         
