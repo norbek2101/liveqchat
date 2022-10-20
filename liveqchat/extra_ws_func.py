@@ -40,7 +40,7 @@ def get_search_message(search_key):
 
 @sync_to_async
 def get_all_msg_from_db(operator_id):
-    messages = IncomingMessage.objects.filter(operator_id=operator_id).order_by("-created_at")
+    messages = IncomingMessage.objects.filter(operator_id=operator_id).order_by("-created_at")[0]
     print("messages", messages)
     msg_duplicate = remove_duplicate(messages)
     print("msg duplicate", msg_duplicate)

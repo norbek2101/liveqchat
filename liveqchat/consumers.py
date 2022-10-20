@@ -304,7 +304,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
             
             except Exception as e:
                 return False
-            return await self.send_list_data({"data": result})   
+            return await self.send_list_data({"list_data": result})   
                  
         else:
             return await  self.send_json({'errors': {"action": f"enter one of the following : {ACTIONS}"}})
@@ -315,7 +315,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def send_list_data(self, context):
-        data = context['data']
+        data = context['list_data']
         await self.send_json(data)
 
     async def disconnect(self, code):
