@@ -90,10 +90,14 @@ class ChatListSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
+
+    operator = OperatorSerializer(read_only = True)
+
     class Meta:
         model = IncomingMessage
         fields = (
-            'id', 'message', 'message', 'photo', 'file', 'created_at', 'user', 'message_id', 'from_user', 'from_operator'
+            'id', 'message', 'operator' ,'created_at', 'user', 'message_id', 'from_user', 'from_operator'
+
         )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}, 'message_id': {'read_only': True}}
 

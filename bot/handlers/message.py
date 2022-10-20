@@ -8,7 +8,10 @@ from telebot import types, TeleBot
 from loguru import logger as lg
 from django.conf import settings
 import logging
-
+from accounts.models import (
+    Operators
+)
+from django.db.models import Count
 
 
 def get_bot_logger(token):
@@ -223,13 +226,19 @@ def initializer_message_handlers(_: TeleBot):
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
                 
-                
+                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
+                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                #     operator.slavebot = user.slavebot
+                #     operator.save()
+                    
+
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
                     file=path,
                     message_id=message.message_id,
-                    from_user=True
+                    from_user=True,
+                    # operator=operator
                 )
                 try:
                 
@@ -257,12 +266,18 @@ def initializer_message_handlers(_: TeleBot):
                     photo=downloaded_file
                 )
                 
+                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
+                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                #     operator.slavebot = user.slavebot
+                #     operator.save()
+
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
                     photo=path,
                     message_id=message.message_id,
-                    from_user=True
+                    from_user=True,
+                    # operator=operator
                 )
                 try:
                 
@@ -275,13 +290,32 @@ def initializer_message_handlers(_: TeleBot):
                     chat_id=message.chat.id,
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
-                
+                try:
+                    
+                    if user.slavebot.operators.first() is None:
+                        operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                        slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                        operator.slavebot = slavebot
+                        operator.save()
+                    else:
+                        operators = Operators.objects.get(operator_id = user.slavebot.operators.first())
+                        if (operators.is_online == False) or (operators.is_active == False):
+                                operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                                slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                                operator.slavebot = slavebot
+                                operator.save()
+                        else:
+                            operator = Operators.objects.get(id = operators.id)
+                except Exception as e:
+                    print(e)
+
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
                     message=message.text,
                     message_id=message.message_id,
-                    from_user=True
+                    from_user=True,
+                    operator=operator
                 )
                 
                 try:
@@ -303,14 +337,19 @@ def initializer_message_handlers(_: TeleBot):
                     chat_id=message.chat.id,
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
-                
+
+                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
+                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                #     operator.slavebot = user.slavebot
+                #     operator.save()
                 
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
                     file=path,
                     message_id=message.message_id,
-                    from_user=True
+                    from_user=True,
+                    # operator = user.slavebot.operator
                 )
                 try:
                 
@@ -333,14 +372,19 @@ def initializer_message_handlers(_: TeleBot):
                     chat_id=message.chat.id,
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
-                
+
+                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
+                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                #     operator.slavebot = user.slavebot
+                #     operator.save()
                 
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
                     file=path,
                     message_id=message.message_id,
-                    from_user=True
+                    from_user=True,
+                    # operator = user.slavebot.operator
                 )
                 try:
                 

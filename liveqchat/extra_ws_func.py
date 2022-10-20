@@ -50,7 +50,7 @@ def get_all_msg_from_db(operator_id):
 
 @sync_to_async
 def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
-    messages = IncomingMessage.objects.filter(Q(operator=operator) | Q(user__chat_id=user_id) | Q(slavebot=bot_id)).order_by("-created_at")
+    messages = IncomingMessage.objects.filter(operator__id=operator.id).filter(Q(user__chat_id=user_id) | Q(slavebot=bot_id)).order_by("-created_at")
     if not messages:
         return {
             "result": "Messages not exist"
