@@ -231,6 +231,25 @@ def initializer_message_handlers(_: TeleBot):
                 #     operator.slavebot = user.slavebot
                 #     operator.save()
                     
+                try:
+                    
+                    if user.slavebot.operators.first() is None:
+                        operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                        slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                        operator.slavebot = slavebot
+                        operator.save()
+                    else:
+                        operators = Operators.objects.get(operator_id = user.slavebot.operators.first())
+                        if (operators.is_online == False) or (operators.is_active == False):
+                                operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                                slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                                operator.slavebot = slavebot
+                                operator.save()
+                        else:
+                            operator = Operators.objects.get(id = operators.id)
+                except Exception as e:
+                    print(e)
+
 
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
@@ -238,7 +257,7 @@ def initializer_message_handlers(_: TeleBot):
                     file=path,
                     message_id=message.message_id,
                     from_user=True,
-                    # operator=operator
+                    operator=operator
                 )
                 try:
                 
@@ -266,10 +285,25 @@ def initializer_message_handlers(_: TeleBot):
                     photo=downloaded_file
                 )
                 
-                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
-                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
-                #     operator.slavebot = user.slavebot
-                #     operator.save()
+                try:
+                    
+                    if user.slavebot.operators.first() is None:
+                        operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                        slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                        operator.slavebot = slavebot
+                        operator.save()
+                    else:
+                        operators = Operators.objects.get(operator_id = user.slavebot.operators.first())
+                        if (operators.is_online == False) or (operators.is_active == False):
+                                operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                                slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                                operator.slavebot = slavebot
+                                operator.save()
+                        else:
+                            operator = Operators.objects.get(id = operators.id)
+                except Exception as e:
+                    print(e)
+
 
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
@@ -277,7 +311,7 @@ def initializer_message_handlers(_: TeleBot):
                     photo=path,
                     message_id=message.message_id,
                     from_user=True,
-                    # operator=operator
+                    operator=operator
                 )
                 try:
                 
@@ -324,7 +358,6 @@ def initializer_message_handlers(_: TeleBot):
                     logger.warning(e)
             
             elif message.content_type == 'voice':
-                
                 _file_name = message.voice.file_id
                 path = 'media/'+_file_name + '.mp3'
                 file_info = bot.get_file(_file_name)
@@ -332,24 +365,39 @@ def initializer_message_handlers(_: TeleBot):
                 with open(path, 'wb') as new_file:
                     new_file.write(downloaded_file)
                     
-    
+                print('PATH1: ', path)
                 bot.send_message(
                     chat_id=message.chat.id,
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
 
-                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
-                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
-                #     operator.slavebot = user.slavebot
-                #     operator.save()
-                
+                try:
+                    
+                    if user.slavebot.operators.first() is None:
+                        operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                        slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                        operator.slavebot = slavebot
+                        operator.save()
+                    else:
+                        operators = Operators.objects.get(operator_id = user.slavebot.operators.first())
+                        if (operators.is_online == False) or (operators.is_active == False):
+                                operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                                slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                                operator.slavebot = slavebot
+                                operator.save()
+                        else:
+                            operator = Operators.objects.get(id = operators.id)
+                except Exception as e:
+                    print(e)
+
+
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
                     file=path,
                     message_id=message.message_id,
                     from_user=True,
-                    # operator = user.slavebot.operator
+                    operator = operator
                 )
                 try:
                 
@@ -373,10 +421,26 @@ def initializer_message_handlers(_: TeleBot):
                     text="Xabaringiz operatorlarga jo'natildi"
                 )
 
-                # if (user.slavebot.operator is None) or (user.slavebot.operator.is_online == False) or (user.slavebot.operator.is_active == False):
-                #     operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
-                #     operator.slavebot = user.slavebot
-                #     operator.save()
+
+                try:
+                    
+                    if user.slavebot.operators.first() is None:
+                        operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                        slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                        operator.slavebot = slavebot
+                        operator.save()
+                    else:
+                        operators = Operators.objects.get(operator_id = user.slavebot.operators.first())
+                        if (operators.is_online == False) or (operators.is_active == False):
+                                operator = Operators.objects.filter(is_active = True).annotate(num_messages = Count("messages")).order_by("num_messages")[0]
+                                slavebot = SlaveBot.objects.get(id = user.slavebot.id)
+                                operator.slavebot = slavebot
+                                operator.save()
+                        else:
+                            operator = Operators.objects.get(id = operators.id)
+                except Exception as e:
+                    print(e)
+
                 
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
