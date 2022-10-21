@@ -76,7 +76,7 @@ class ChatListSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomingMessage
         fields = (
-            'id', 'user', 'message', 'created_at', 'slavebot'
+            'id', 'user', 'message', 'created_at', 'slavebot', 'photo', 'file', 'is_sent', 'is_read', 'from_user', 'from_operator'
             )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}}
 

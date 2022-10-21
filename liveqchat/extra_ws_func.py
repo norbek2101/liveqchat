@@ -40,7 +40,7 @@ def get_search_message(search_key):
 
 @sync_to_async
 def get_all_msg_from_db(operator_id):
-    messages = IncomingMessage.objects.filter(operator_id=operator_id).order_by("-created_at")[0]
+    messages = IncomingMessage.objects.filter(operator_id=operator_id).order_by("-created_at")
     print("messages", messages)
     msg_duplicate = remove_duplicate(messages)
     print("msg duplicate", msg_duplicate)
@@ -85,7 +85,8 @@ def send_msg_to_user(content, user):
         incmsg.from_operator = True
         incmsg.is_read = True
         incmsg.save()
-        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        # botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
         send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
 
         messages = IncomingMessage.objects.filter(operator=incmsg.operator,
