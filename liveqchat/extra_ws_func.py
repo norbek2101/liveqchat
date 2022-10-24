@@ -85,8 +85,8 @@ def send_msg_to_user(content, user):
         incmsg.from_operator = True
         incmsg.is_read = True
         incmsg.save()
-        # botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
+        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        # botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
         send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
 
         messages = IncomingMessage.objects.filter(operator=incmsg.operator,
