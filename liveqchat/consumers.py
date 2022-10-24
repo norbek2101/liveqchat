@@ -63,7 +63,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 f"operator_list_{operator.id}",
                 {
                     'type': 'send_data',
-                    "data": [result["messages"][len(result["messages"])-1]]
+                    "data": [result["messages"][len(result["messages"])]]
                 }
             )
             return await self.channel_layer.group_send(
@@ -81,16 +81,33 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return await self.send_json({"errors": {"photo": 'This field is required!'}})
             
             result = await send_photo_to_user(content, operator)
+
+            await self.channel_layer.group_send(
+                f"operator_list_{operator.id}",
+                {
+                    'type': 'send_data',
+                    "data": [result["messages"][len(result["messages"])]]
+                }
+            )
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'send_data',
-                    "data": result,
-                },  
+                    "data": result
+                }
             )
 
         elif action == 'send-voice':
             result = await send_voice_to_user(content, operator)
+
+            await self.channel_layer.group_send(
+                f"operator_list_{operator.id}",
+                {
+                    'type': 'send_data',
+                    "data": [result["messages"][len(result["messages"])]]
+                }
+            )
+
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -101,6 +118,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
         elif action == 'send-video':
             result = await send_video_to_user(content, operator)
+            
+            await self.channel_layer.group_send(
+                f"operator_list_{operator.id}",
+                {
+                    'type': 'send_data',
+                    "data": [result["messages"][len(result["messages"])]]
+                }
+            )
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
