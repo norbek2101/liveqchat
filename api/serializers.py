@@ -91,8 +91,6 @@ class ChatListSerializer(serializers.ModelSerializer):
 
 class ChatSerializer(serializers.ModelSerializer):
 
-    operator = OperatorSerializer(read_only = True)
-
     class Meta:
         model = IncomingMessage
         fields = (

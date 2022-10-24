@@ -58,6 +58,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif action == 'send-message':
 
             result = await send_msg_to_user(content, operator)
+
+            await self.channel_layer.group_send(
+                f"operator_list_{operator.id}",
+                {
+                    'type': 'send_data',
+                    "data": [result["messages"][len(result["messages"])-1]]
+                }
+            )
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -258,7 +266,7 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
             return await self.close()
         else:
             await set_online_date_operator(operator.id)
-            self.room_group_name = f"operator_{operator.id}"
+            self.room_group_name = f"operator_list_{operator.id}"
             '''Join room group'''
             await self.channel_layer.group_add(
                 self.room_group_name,
