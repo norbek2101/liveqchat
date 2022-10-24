@@ -63,7 +63,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 f"operator_list_{operator.id}",
                 {
                     'type': 'send_data',
-                    "data": [result["messages"][len(result["messages"])]]
+                    "data": [result["messages"][len(result["messages"])-1]]
                 }
             )
             return await self.channel_layer.group_send(
@@ -86,7 +86,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 f"operator_list_{operator.id}",
                 {
                     'type': 'send_data',
-                    "data": [result["messages"][len(result["messages"])]]
+                    "data": [result["messages"][len(result["messages"])-1]]
                 }
             )
             return await self.channel_layer.group_send(
@@ -104,7 +104,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 f"operator_list_{operator.id}",
                 {
                     'type': 'send_data',
-                    "data": [result["messages"][len(result["messages"])]]
+                    "data": [result["messages"][len(result["messages"])-1]]
                 }
             )
 
@@ -118,12 +118,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
         elif action == 'send-video':
             result = await send_video_to_user(content, operator)
-            
+
             await self.channel_layer.group_send(
                 f"operator_list_{operator.id}",
                 {
                     'type': 'send_data',
-                    "data": [result["messages"][len(result["messages"])]]
+                    "data": [result["messages"][len(result["messages"])-1]]
                 }
             )
             return await self.channel_layer.group_send(
