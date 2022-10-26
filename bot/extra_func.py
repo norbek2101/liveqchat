@@ -63,6 +63,14 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             print("instance.operator", instance.operator)
             async_to_sync(
                 channel_layer.group_send)(
+                                            f'operator_list_{operator.id}',
+                                            {
+                                                'type': 'send_data',
+                                                'data':  {"results": [obj]}
+                                            }
+                                        )
+            async_to_sync(
+                channel_layer.group_send)(
                                             f'operator_{operator.id}',
                                             {
                                                 'type': 'send_data',

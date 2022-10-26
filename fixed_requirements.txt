@@ -14,3 +14,4 @@ pyngrok
 djangorestframework-simplejwt
 pandas
 python-telegram-bot
+daphne
