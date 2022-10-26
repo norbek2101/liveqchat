@@ -24,7 +24,7 @@ urlpatterns = [
                 path('request-reset-email/', RequestPasswordResetEmail.as_view(), name="request-reset-email"),
                 path('password-reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
                 path('password-reset-complete/', SetNewPasswordAPIView.as_view(), name='password-reset-complete'),
-                # path('send-photo/', SendPhoto.as_view(), name=' '),
+                path('send-photo/', SendPhoto.as_view(), name=' '),
                 path('save/photo/', ReceivePhotoView.as_view(), name='save-photo'),
                 path("save/file/", ReceiveFileView.as_view(), name="save-file")
                 

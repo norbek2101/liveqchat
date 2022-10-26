@@ -1,3 +1,4 @@
+from http import server
 import os
 import uuid
 import datetime
@@ -30,7 +31,11 @@ from collections import Counter
 from django.http import Http404
 import pandas as pd
 import telegram
-
+import json
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from asgiref.sync import async_to_sync
+from django.db.models import Q
+from channels.layers import get_channel_layer
 
 class BotList(generics.ListAPIView):
     permission_classes = (AllowAny, )
@@ -616,24 +621,35 @@ class SendMessage(APIView):
 class SendPhoto(APIView):
     parser_classes = (FormParser, MultiPartParser)
     permission_classes  =(AllowAny,)
-    my_token = '5462908065:AAGAMYuKOv8sxSP7ObG2xSfQ3lsLbhO0pcA'
     
-    
-    def send_photo_to_bot(self, photo, chat_id):
-        print("send_photo_to_bot")
-        bot = telegram.Bot(token=self.my_token)
-        bot.send_photo(chat_id=chat_id, photo=photo)
-    
+
     @swagger_auto_schema(request_body=SendPhotoSerializer, tags=["send-message"])
+
+
     def post(self, request):
-        serializer = SendPhotoSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        bot = telegram.Bot(token=self.my_token)
-        bot.send_photo(chat_id=632179390, photo=request.data['photo'])
-        return Response({
-            "status": 'success'
-        })
+        chat_id = request.POST.get("chat_id")
+        bot_id = request.POST.get("slavebot")
+        photo = request.FILES.get("photo")
+        slave = SlaveBot.objects.get(id = bot_id)
+        user = BotUser.objects.filter(chat_id = chat_id)
+
+        channel_layer = get_channel_layer()
+        msg = IncomingMessage.objects.create(slavebot = slave, photo = photo, operator = request.user, user = user[0] )
+
+        bot = telegram.Bot(token=slave.token)
+        bot.send_photo(chat_id=chat_id, photo=f"https://liveqchat.m1.uz/media/{msg.photo}")
+
+        response = filter_messages(chat_id, bot_id, request.user, 1, 15)
+
+        async_to_sync(channel_layer.group_send)( 
+            f"operator_{request.user.id}",
+            {
+                "type": "send.data",
+                "data": response
+            }
+        )
+
+        return Response("successfully")
 
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
@@ -715,3 +731,35 @@ class ReceiveFileView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({'file_url': serializer.data['file']})
+
+async def send_data(event):
+    data = event['data']
+    AsyncJsonWebsocketConsumer.send_json(data)
+
+
+def filter_messages(user_id, bot_id, operator, page=1, page_size=15):
+    messages = IncomingMessage.objects.filter(operator__id=operator.id).filter(Q(user__chat_id=user_id) | Q(slavebot=bot_id)).order_by("-created_at")
+    if not messages:
+        return {
+            "result": "Messages not exist"
+            }
+        
+    pag_msg = messages[page_size*page-page_size:page*page_size][::-1]  
+    
+    import math
+
+    if page_size != 0:
+        total_pages = math.ceil(messages.count()/page_size)
+        serializer = ChatSerializer(pag_msg, many=True)
+
+    else:
+        total_pages = ''
+        serializer = ChatSerializer(messages, many=True)
+        
+    if page*page_size > messages.count():
+        serializer = ChatSerializer(pag_msg, many=True)
+        
+    return {
+            "total_page": total_pages,
+            "result": serializer.data
+           }
