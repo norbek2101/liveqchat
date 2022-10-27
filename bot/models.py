@@ -1,5 +1,3 @@
-from ast import operator
-from email.policy import default
 from bot.utils.abstract import BaseModel
 from django.db import models
 
@@ -79,8 +77,7 @@ class IncomingMessage(BaseModel):
     message = models.CharField(max_length=5000, null=True)
     message_id = models.BigIntegerField('botdan yozilgan xabar IDsi', null=True, blank=True)
     photo = models.ImageField(null=True, blank=True, validators=[validate_file_extension])
-    # photo = models.CharField(max_length=300, null=True)
-    file = models.CharField(max_length=300, null=True, blank=True)
+    file = models.FileField(null=True, blank=True, validators=[validate_file_extension])
     from_user = models.BooleanField(default=False)
     from_operator = models.BooleanField(default=False)
     is_read = models.BooleanField(default=False)

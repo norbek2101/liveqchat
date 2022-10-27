@@ -1,10 +1,8 @@
-from http import server
-import os
 import uuid
 import datetime
 from .serializers import (
                           AddOperatorSerializer, ChatListSerializer, ChatSerializer, OperatorSerializer, 
-                          ResetPasswordEmailRequestSerializer, SavePhotoSerializer, SetNewPasswordSerializer, 
+                          ResetPasswordEmailRequestSerializer, SavePhotoSerializer, SendFileSerializer, SetNewPasswordSerializer, 
                           SlaveBotSerializer, ChangePasswordSerializer, SendMessageSerializer, 
                           SendPhotoSerializer, BlackListSerializer, SaveFileSerializer
                            )
@@ -31,7 +29,6 @@ from collections import Counter
 from django.http import Http404
 import pandas as pd
 import telegram
-import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.db.models import Q
@@ -623,7 +620,7 @@ class SendPhoto(APIView):
     permission_classes  =(AllowAny,)
     
 
-    @swagger_auto_schema(request_body=SendPhotoSerializer, tags=["send-message"])
+    @swagger_auto_schema(request_body=SendPhotoSerializer, tags=["send-photo"])
 
 
     def post(self, request):
@@ -649,7 +646,8 @@ class SendPhoto(APIView):
             }
         )
 
-        return Response("successfully")
+        return Response({"photo_url":f"/media/{msg.photo}"})
+
 
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
