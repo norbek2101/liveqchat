@@ -211,6 +211,8 @@ def initializer_message_handlers(_: TeleBot):
             )
             return
         else:
+            print("***", message.content_type)
+            
             if message.content_type == 'document':
                 
                 file_name = message.document.file_name
@@ -405,10 +407,13 @@ def initializer_message_handlers(_: TeleBot):
                 except Exception as e:
                     logger.warning(e)
             
-            elif message.content_type == 'video':
+            elif (message.content_type == 'video') or (message.content_type == 'video_note'):
                 
-                _file_name = message.video.file_id
-                
+                if message.content_type == "video":
+                    _file_name = message.video.file_id
+                else:
+                    _file_name = message.video_note.file_id
+
                 path = 'media/'+ _file_name + '.mp4'
                 file_info = bot.get_file(_file_name)
                 downloaded_file = bot.download_file(file_info.file_path)
