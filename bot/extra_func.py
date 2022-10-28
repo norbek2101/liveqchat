@@ -6,6 +6,29 @@ from asgiref.sync import async_to_sync
 from django.db.models import Count, Q
 from telebot import TeleBot
 from loguru import logger as lg
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from colorama import Fore
+
+class SendMessage(AsyncJsonWebsocketConsumer):
+    # print(Fore.GREEN+"\n\n\n***********\n\n\n", Fore.WHITE)
+    def send(self, operator, data):
+
+        channel_layer = get_channel_layer()
+
+        print(Fore.GREEN+f"\n\n\n{f'operator_{operator.id}'}\n\n\n", Fore.WHITE)
+
+        print(async_to_sync(channel_layer.group_send)(
+                f'operator_{operator.id}',
+                AsyncJsonWebsocketConsumer.send({"results": [data]})
+            ))
+        return "Sent"
+    # @async_to_sync
+    # def send_data(self, event):
+    #     print(Fore.GREEN+"\n\n\n***********\n\n\n", Fore.WHITE)
+    #     data = event['data']
+    #     return self.send_json(data)
+            
+
 
 def send_to_operator(instance: IncomingMessage, logger: lg):
     if instance.is_sent:
@@ -61,22 +84,17 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             print("extra func")
             instance.operator = operator
             print("instance.operator", instance.operator)
-            async_to_sync(
-                channel_layer.group_send)(
-                                            f'operator_list_{operator.id}',
-                                            {
-                                                'type': 'send_data',
-                                                'data':  {"results": [obj]}
-                                            }
-                                        )
-            async_to_sync(
-                channel_layer.group_send)(
-                                            f'operator_{operator.id}',
-                                            {
-                                                'type': 'send_data',
-                                                'data':  {"results": [obj]}
-                                            }
-                                        )
+            # async_to_sync(
+            #     channel_layer.group_send)(
+            #                                 f'operator_list_{operator.id}',
+            #                                 {
+            #                                     'type': 'send_data',
+            #                                     'data':  {"results": [obj]}
+            #                                 }
+            #            
+
+            print("\n\n\n\n",SendMessage.send(AsyncJsonWebsocketConsumer, operator, obj),"\n\n\n\n")
+
             instance.is_sent = True
             if operator.username:
                 operator: Operators

@@ -730,8 +730,10 @@ class ReceiveFileView(APIView):
             serializer.save()
             return Response({'file_url': serializer.data['file']})
 
+
 async def send_data(event):
     data = event['data']
+ 
     AsyncJsonWebsocketConsumer.send_json(data)
 
 

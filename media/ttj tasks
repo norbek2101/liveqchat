@@ -1,0 +1,41 @@
+talaba turgan xona ni id sini qaytarish kk GET +++
+talabani turgan xonasini o'zgartirish PATCH +++
+
+talabani xonadan chiqarib yuborish DELETE +++
+
+
+chat tasks:
+
+
+yoshlar ittifoqi - ADMIN
+talabalar - user
+
+shu ikkalasini bog'laydigan - portal yaratish kk
+
+hamma userlar unga yoza oladi
+
+user esa unga javob qaytaradi
+
+
+hamma userlar bitta portal ga murojaat yo'llaydi
+
+bazada saqlanadi
+
+admin har bir userga javob yozadi
+
+
+
+mrgs obj lar bor
+
+har bir obj da user bor
+
+mrg lar bitta user dan bir nechat marta kelgan bo'lishi mumkin
+
+bitta user ni hamma murojaatlarni olish qiyin emas -- buni qildim
+
+endi user connect bo'lganda unga murojaat yo'llagan user ro'yxati ko'rinishi kk
+
+
+
+
+
