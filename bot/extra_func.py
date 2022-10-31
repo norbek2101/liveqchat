@@ -45,12 +45,18 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             operator = online_operators.first()
         else:
             operator = offline_operator.first()
+    print(Fore.RED+"\n\n\nWorking 1\n\n\n"+Fore.GREEN)
 
-    serializer = ChatSerializer(data, many = False)
+    messages = IncomingMessage.objects.filter(operator_id = operator.id).filter(Q(user__chat_id=usr.chat_id) | Q(slavebot_id=usr.slavebot.id)).order_by("-created_at")
+
+    print(Fore.RED+"\n\n\nWorking 2\n\n\n"+Fore.GREEN)
+
+    serializer = ChatSerializer(IncomingMessage.objects.get(id = data["id"]), many = False)
     
     if operator is not None:
         try:
             instance.operator = operator           
+            print(Fore.RED+f"\n\n\{serializer.data} 3\n\n\n"+Fore.GREEN)
 
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)( 
