@@ -64,6 +64,17 @@ class AddOperatorSerializer(serializers.ModelSerializer):
                 )
 
 
+class FileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = File
+        fields = (
+            'id',
+            'file',
+            'type'
+        )
+
+
 # class IncomingMessageSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = IncomingMessage
@@ -73,12 +84,20 @@ class AddOperatorSerializer(serializers.ModelSerializer):
 #         )
 
 class ChatListSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField(read_only = True)
+
     class Meta:
         model = IncomingMessage
         fields = (
-            'id', 'user', 'message', 'created_at', 'slavebot', 'photo', 'file', 'is_sent', 'is_read', 'from_user', 'from_operator'
+            'id', 'user', 'message', 'created_at', 'slavebot', 'file', 'is_sent', 'is_read', 'from_user', 'from_operator'
             )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}}
+
+    def get_file(self, obj):
+        files = obj.file.all()
+        serializer = FileSerializer(files, many = True)
+
+        return serializer.data
 
     def to_representation(self, instance):
         unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
@@ -89,15 +108,6 @@ class ChatListSerializer(serializers.ModelSerializer):
         return representation
 
 
-class FileSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = File
-        fields = (
-            'id',
-            'file',
-            'type'
-        )
 
 
 class ChatSerializer(serializers.ModelSerializer):
