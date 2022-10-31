@@ -45,8 +45,6 @@ class IncomingMesageAdmin(admin.ModelAdmin):
         'reply',
         'message',
         'message_id',
-        'photo',
-        'file',
         'is_read',
         'from_user',
         'from_operator',
@@ -64,15 +62,8 @@ class IncomingMesageAdmin(admin.ModelAdmin):
 class FileAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'user',
-        'operator',
-        'photo',
-        'file',
+        'type',
         'created_at'
-    )
-    list_editable = (
-        'user', 
-        'operator'
     )
     def get_image(self, obj):
         return mark_safe(f'<img src = {obj.photo.url} width = "120" height = "80">')
