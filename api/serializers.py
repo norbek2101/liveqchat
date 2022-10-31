@@ -124,6 +124,7 @@ class ChatSerializer(serializers.ModelSerializer):
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}, 'message_id': {'read_only': True}}
 
     def get_file(self, obj):
+        print(obj,"\n\n\n\n\n")
         files = obj.file.all()
         serializer = FileSerializer(files, many = True)
 
