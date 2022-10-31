@@ -6,6 +6,11 @@ from asgiref.sync import async_to_sync
 from django.db.models import Count, Q
 from telebot import TeleBot
 from loguru import logger as lg
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from colorama import Fore
+from api.serializers import ChatSerializer
+from liveqchat.extra_ws_func import filter_msg_by_user
+
 
 def send_to_operator(instance: IncomingMessage, logger: lg):
     if instance.is_sent:
@@ -13,22 +18,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
     channel_layer = get_channel_layer()
     data = model_to_dict(instance)
     usr = BotUser.objects.get(id=data['user'])
-    obj = {}
-    obj['id'] = data['id']
-    obj['message'] = data['message']
-    obj['photo'] = data['photo']
-    obj['file'] = data['file']
-    obj['photo'] = data['photo']
-    obj['user'] = data['user']
-    obj['slavebot'] = data['slavebot']
-    obj['message_id'] = data['message_id']
-    obj['from_user'] = data['from_user']
-    obj['from_operator'] = data['from_operator']
-    obj['from_user'] = data['from_user']
-    obj['is_read'] = data['is_read']
-    obj['is_sent'] = data['is_sent']
-    obj['name'] = f"{usr.firstname} {usr.lastname}"
-    obj['created_at'] = str(instance.created_at.strftime('%Y-%m-%d %H:%M:%S'))
+    
 
     bot_operators = Operators.objects.filter(
         slavebot=instance.slavebot,
@@ -55,28 +45,32 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             operator = online_operators.first()
         else:
             operator = offline_operator.first()
+    print(Fore.RED+"\n\n\nWorking 1\n\n\n"+Fore.GREEN)
+
+    messages = IncomingMessage.objects.filter(operator_id = operator.id).filter(Q(user__chat_id=usr.chat_id) | Q(slavebot_id=usr.slavebot.id)).order_by("-created_at")
+
+    print(Fore.RED+"\n\n\nWorking 2\n\n\n"+Fore.GREEN)
+
+    serializer = ChatSerializer(messages, many = True)
     
     if operator is not None:
         try:
-            print("extra func")
-            instance.operator = operator
-            print("instance.operator", instance.operator)
-            async_to_sync(
-                channel_layer.group_send)(
-                                            f'operator_list_{operator.id}',
-                                            {
-                                                'type': 'send_data',
-                                                'data':  {"results": [obj]}
-                                            }
-                                        )
-            async_to_sync(
-                channel_layer.group_send)(
-                                            f'operator_{operator.id}',
-                                            {
-                                                'type': 'send_data',
-                                                'data':  {"results": [obj]}
-                                            }
-                                        )
+            instance.operator = operator           
+            print(Fore.RED+"\n\n\nWorking 3\n\n\n"+Fore.GREEN)
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)( 
+                f"operator_{operator.id}",
+                {
+                    "type": "send.data",
+                    "data": {
+                        "total_page": len(serializer.data)//15,
+                        "result": serializer.data
+                    }
+                }
+            )
+
+
             instance.is_sent = True
             if operator.username:
                 operator: Operators
@@ -100,4 +94,7 @@ def send_to_operator(instance: IncomingMessage, logger: lg):
             
     return True
 
-
+async def send_data(event):
+    data = event['data']
+    print(Fore.RED+"\n\n\nWorking\n\n\n"+Fore.GREEN)
+    AsyncJsonWebsocketConsumer.send_json(data)

@@ -1,5 +1,5 @@
 from bot.utils.extra import make_keyboards, slavebot_register_user
-from bot.models import BotUser, File, IncomingMessage, SlaveBot
+from bot.models import BotUser, File, IncomingMessage, SlaveBot, File
 from bot.utils.constants import Text, BtnText
 from telebot.util import content_type_media
 from bot.extra_func import send_to_operator
@@ -256,11 +256,16 @@ def initializer_message_handlers(_: TeleBot):
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
-                    file=path,
                     message_id=message.message_id,
                     from_user=True,
                     operator=operator
                 )
+
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+
+                inc_msg.file.add(up_file)
+                inc_msg.save()
+
                 try:
                 
                     send_to_operator(inc_msg, logger)
@@ -280,11 +285,6 @@ def initializer_message_handlers(_: TeleBot):
                 bot.send_message(
                     chat_id=message.chat.id,
                     text="Xabaringiz operatorlarga jo'natildi"
-                )
-                
-                File.objects.create(
-                    user=user,
-                    photo=downloaded_file
                 )
                 
                 try:
@@ -310,11 +310,16 @@ def initializer_message_handlers(_: TeleBot):
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
-                    photo=path,
                     message_id=message.message_id,
                     from_user=True,
                     operator=operator
                 )
+                
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+
+                inc_msg.file.add(up_file)
+                inc_msg.save()
+
                 try:
                 
                     send_to_operator(inc_msg, logger)
@@ -353,6 +358,8 @@ def initializer_message_handlers(_: TeleBot):
                     from_user=True,
                     operator=operator
                 )
+
+                
                 
                 try:
                     send_to_operator(inc_msg, logger)
@@ -367,7 +374,6 @@ def initializer_message_handlers(_: TeleBot):
                 with open(path, 'wb') as new_file:
                     new_file.write(downloaded_file)
                     
-                print('PATH1: ', path)
                 bot.send_message(
                     chat_id=message.chat.id,
                     text="Xabaringiz operatorlarga jo'natildi"
@@ -396,11 +402,16 @@ def initializer_message_handlers(_: TeleBot):
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
-                    file=path,
                     message_id=message.message_id,
                     from_user=True,
                     operator = operator
                 )
+
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+
+                inc_msg.file.add(up_file)
+                inc_msg.save()
+
                 try:
                 
                     send_to_operator(inc_msg, logger)
@@ -450,11 +461,17 @@ def initializer_message_handlers(_: TeleBot):
                 inc_msg = IncomingMessage.objects.create(
                     user=user,
                     slavebot=user.slavebot,
-                    file=path,
+                    # file=path,
                     message_id=message.message_id,
                     from_user=True,
-                    # operator = user.slavebot.operator
+                    operator = operator
                 )
+
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+
+                inc_msg.file.add(up_file)
+                inc_msg.save()
+
                 try:
                 
                     send_to_operator(inc_msg, logger)

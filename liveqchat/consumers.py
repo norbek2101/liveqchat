@@ -31,7 +31,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            return  await self.send(json.dumps({"message": "operator connected", "operator": str(operator.id)}))
+            return  await self.send(json.dumps({"message": "operator connected", "operator": self.room_group_name}))
 
 
     async def receive(self, text_data):

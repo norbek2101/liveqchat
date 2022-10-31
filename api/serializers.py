@@ -89,15 +89,33 @@ class ChatListSerializer(serializers.ModelSerializer):
         return representation
 
 
+class FileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = File
+        fields = (
+            'id',
+            'file',
+            'type'
+        )
+
+
 class ChatSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField(read_only = True)
 
     class Meta:
         model = IncomingMessage
         fields = (
-            'id', 'message', 'operator' ,  'created_at', 'user', 'message_id', 'from_user', 'from_operator'
+            'id', 'message', 'operator' , 'file', 'created_at', 'user', 'message_id', 'from_user', 'from_operator'
 
         )
         extra_kwargs = {'user': {'required':False}, 'operator_id': {'read_only': True}, 'message_id': {'read_only': True}}
+
+    def get_file(self, obj):
+        files = obj.file.all()
+        serializer = FileSerializer(files, many = True)
+
+        return serializer.data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

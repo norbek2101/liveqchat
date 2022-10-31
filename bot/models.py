@@ -1,3 +1,4 @@
+from secrets import choice
 from bot.utils.abstract import BaseModel
 from django.db import models
 
@@ -8,6 +9,13 @@ from django.core.exceptions import ValidationError
     
 # def upload_path(instance, filename):
 #     return f"{instance.staff.first_name}/{filename}"
+
+FILE_TYPES = [
+    ("document", "document"),
+    ("image", "image"),
+    ("audio", "audio"),
+    ("media", "media")
+]
 
 
 class SlaveBot(BaseModel):
@@ -76,8 +84,7 @@ class IncomingMessage(BaseModel):
     reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replied_messages', null=True, blank=True)
     message = models.CharField(max_length=5000, null=True)
     message_id = models.BigIntegerField('botdan yozilgan xabar IDsi', null=True, blank=True)
-    photo = models.ImageField(null=True, blank=True, validators=[validate_file_extension])
-    file = models.FileField(null=True, blank=True, validators=[validate_file_extension])
+    file = models.ManyToManyField("File")
     from_user = models.BooleanField(default=False)
     from_operator = models.BooleanField(default=False)
     is_read = models.BooleanField(default=False)
@@ -108,14 +115,11 @@ class BlackList(BaseModel):
         verbose_name_plural = "Qora ro'yhat"
 
 class File(BaseModel):
-    user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name="photos")
-    operator = models.ForeignKey('accounts.Operators', on_delete=models.CASCADE, related_name='photos', null=True, blank=True)
-    photo = models.ImageField(null=True, blank=True)
     file = models.FileField(null=True, blank=True)
-    
+    type = models.CharField(max_length = 255, choices = FILE_TYPES, null = True, blank = True)
     
     def __str__(self):
-         return f'{self.user.chat_id} {self.operator}'
+         return f'{self.type}'
 
     class Meta:
         verbose_name = "Fayl"

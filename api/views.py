@@ -8,7 +8,7 @@ from .serializers import (
                            )
 from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from bot.models import BotUser, IncomingMessage, SlaveBot, BlackList
+from bot.models import BotUser, IncomingMessage, SlaveBot, BlackList, File
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from rest_framework.permissions import  AllowAny, IsAuthenticated
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -33,6 +33,8 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.db.models import Q
 from channels.layers import get_channel_layer
+from core import settings
+import magic
 
 class BotList(generics.ListAPIView):
     permission_classes = (AllowAny, )
@@ -626,15 +628,40 @@ class SendPhoto(APIView):
     def post(self, request):
         chat_id = request.POST.get("chat_id")
         bot_id = request.POST.get("slavebot")
-        photo = request.FILES.get("photo")
+        file = request.FILES.get("file")
         slave = SlaveBot.objects.get(id = bot_id)
         user = BotUser.objects.filter(chat_id = chat_id)
 
         channel_layer = get_channel_layer()
-        msg = IncomingMessage.objects.create(slavebot = slave, photo = photo, operator = request.user, user = user[0] )
+        msg = IncomingMessage.objects.create(slavebot = slave, operator = request.user, user = user[0] )
 
+        up_file = File.objects.create(file = file)
+
+        msg.file.add(up_file)
+        msg.save()
+        file_type = magic.from_file(str(settings.BASE_DIR) + up_file.file.url)
         bot = telegram.Bot(token=slave.token)
-        bot.send_photo(chat_id=chat_id, photo=f"https://liveqchat.m1.uz/media/{msg.photo}")
+        print(file_type, "\n\n\n\n\n")
+        if "image" in file_type:
+            up_file.type = "image"
+
+            bot.send_photo(chat_id=chat_id, photo=f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+        elif "audio" in file_type:
+            up_file.type = "audio"
+
+            bot.send_audio(chat_id=chat_id, audio=f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+
+        elif "media" in file_type:
+            up_file.type = "media"
+
+            bot.send_video(chat_id = chat_id, video = f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+        
+        elif "document" in file_type:
+            up_file.type = "document"
+
+            bot.send_document(chat_id = chat_id, document = f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+
+        up_file.save()
 
         response = filter_messages(chat_id, bot_id, request.user, 1, 15)
 
@@ -646,7 +673,7 @@ class SendPhoto(APIView):
             }
         )
 
-        return Response({"photo_url":f"/media/{msg.photo}"})
+        return Response({"photo_url":f"/media/{up_file.file.url}"})
 
 
 
@@ -730,8 +757,10 @@ class ReceiveFileView(APIView):
             serializer.save()
             return Response({'file_url': serializer.data['file']})
 
+
 async def send_data(event):
     data = event['data']
+ 
     AsyncJsonWebsocketConsumer.send_json(data)
 
 

@@ -1,10 +1,11 @@
 import os
 import math
+from pty import slave_open
 import telegram
 from django.utils import timezone
 from django.db.models import Q
 from asgiref.sync import sync_to_async
-from bot.models import BotUser, IncomingMessage
+from bot.models import BotUser, IncomingMessage, SlaveBot
 from accounts.models import Operators
 from api.serializers import (
                             ChatSerializer, SearchSerializer, SendMessageSerializer,
@@ -51,6 +52,7 @@ def get_all_msg_from_db(operator_id):
 @sync_to_async
 def filter_msg_by_user(user_id, bot_id, operator, page=1, page_size=15):
     messages = IncomingMessage.objects.filter(operator__id=operator.id).filter(Q(user__chat_id=user_id) | Q(slavebot=bot_id)).order_by("-created_at")
+    # messages = IncomingMessage.objects.filter(operator__id=operator.id, user=user_id, slavebot=bot_id).order_by("-created_at")
     if not messages:
         return {
             "result": "Messages not exist"
@@ -85,9 +87,9 @@ def send_msg_to_user(content, user):
         incmsg.from_operator = True
         incmsg.is_read = True
         incmsg.save()
-        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        # botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
-        send_msg_to_bot(serializer.data['message'], botuser.chat_id, token=incmsg.slavebot.token)
+        # botuser = BotUser.objects.get(chat_id=serializer.data['user'])
+        botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
+        send_msg_to_bot(serializer.data['message'], botuser[0].chat_id, token=incmsg.slavebot.token)
 
         messages = IncomingMessage.objects.filter(operator=incmsg.operator,
                     user__chat_id=serializer.data['user'],
@@ -112,8 +114,8 @@ def send_photo_to_user(content, user):
         incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
         incmsg.is_read = True
         incmsg.save()
-        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        send_photo_to_bot(serializer.data['photo'], botuser.chat_id, token=incmsg.slavebot.token)
+        botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
+        send_photo_to_bot(serializer.data['photo'], botuser[0].chat_id, token=incmsg.slavebot.token)
         return serializer.data
     else:
         return serializer.errors  
@@ -132,8 +134,8 @@ def send_video_to_user(content, user):
         incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
         incmsg.is_read = True
         incmsg.save()
-        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        send_video_to_bot(serializer.data['file'], botuser.chat_id, token=incmsg.slavebot.token)
+        botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
+        send_video_to_bot(serializer.data['file'], botuser[0].chat_id, token=incmsg.slavebot.token)
         return serializer.data
     else:
         return serializer.errors  
@@ -152,8 +154,8 @@ def send_voice_to_user(content, user):
         incmsg = IncomingMessage.objects.get(id=serializer.data['id'])
         incmsg.is_read = True
         incmsg.save()
-        botuser = BotUser.objects.get(chat_id=serializer.data['user'])
-        send_voice_to_bot(serializer.data['file'], botuser.chat_id, token=incmsg.slavebot.token)
+        botuser = BotUser.objects.filter(chat_id=serializer.data['user'])
+        send_voice_to_bot(serializer.data['file'], botuser[0].chat_id, token=incmsg.slavebot.token)
         return serializer.data
     else:
         return serializer.errors    
