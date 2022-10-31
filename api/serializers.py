@@ -96,8 +96,10 @@ class ChatListSerializer(serializers.ModelSerializer):
     def get_file(self, obj):
         files = obj.file.all()
         serializer = FileSerializer(files, many = True)
-
-        return serializer.data
+        if serializer.data == []:
+            return None
+        else:
+            return serializer.data
 
     def to_representation(self, instance):
         unread_count = IncomingMessage.objects.filter(user=instance.user, is_read=False).count()
@@ -125,7 +127,10 @@ class ChatSerializer(serializers.ModelSerializer):
         files = obj.file.all()
         serializer = FileSerializer(files, many = True)
 
-        return serializer.data
+        if serializer.data == []:
+            return None
+        else:
+            return serializer.data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
