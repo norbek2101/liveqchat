@@ -204,13 +204,13 @@ class SendMessageSerializer(serializers.ModelSerializer):
 class SavePhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
-        fields = ('id', 'user', 'operator', 'photo', 'created_at')
+        fields = ('id', 'file', 'created_at')
 
 
 class SaveFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
-        fields = ('id', 'user', 'operator', 'file', 'created_at')
+        fields = ('id', 'file', 'created_at')
 
 
 class SendPhotoSerializer(serializers.ModelSerializer):
