@@ -160,7 +160,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'message', 'chat_id', 'photo', 'slavebot', 'created_at', 'message_id', 'from_user', 'from_operator')
+        fields = ('id', 'message', 'chat_id', 'file', 'slavebot', 'created_at', 'message_id', 'from_user', 'from_operator')
         
         extra_kwargs = {
             'message_id': {
@@ -218,7 +218,7 @@ class SendPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomingMessage
         # fields = ('id', 'photo', 'slavebot', 'chat_id', 'created_at', 'message_id')
-        fields = ('id', 'photo', 'slavebot', 'chat_id')
+        fields = ('id', 'file', 'slavebot', 'chat_id')
 
         # extra_kwargs = {
         #         'message_id': {
