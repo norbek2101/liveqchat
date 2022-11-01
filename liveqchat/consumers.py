@@ -70,7 +70,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'send_data',
-                    "data": [result["messages"][-1]]
+                    "data": {"result":[result["messages"][-1]]}
                 }
             )
             
