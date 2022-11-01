@@ -160,7 +160,7 @@ class SendMessageSerializer(serializers.ModelSerializer):
     chat_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = IncomingMessage
-        fields = ('id', 'message', 'chat_id', 'file', 'slavebot', 'created_at', 'message_id', 'from_user', 'from_operator')
+        fields = ('id', 'message', 'chat_id', 'slavebot', 'created_at', 'message_id', 'from_user', 'from_operator')
         
         extra_kwargs = {
             'message_id': {
@@ -186,8 +186,8 @@ class SendMessageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         chat_id = validated_data.pop('chat_id')
         slave_bot = self.context.slavebot
-        user = BotUser.objects.get(chat_id=chat_id)
-        validated_data['user'] = user
+        user = BotUser.objects.filter(chat_id=chat_id)
+        validated_data['user'] = user[0]
         validated_data['slavebot'] = slave_bot
         validated_data['operator'] = self.context
         return super().create(validated_data)  
