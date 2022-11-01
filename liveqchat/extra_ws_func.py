@@ -98,7 +98,7 @@ def send_msg_to_user(content, user):
         serializer1 = SendMessageSerializer(messages, many=True)
         return {"messages": serializer1.data[:15][::-1]}
     else:
-        return serializer.errors  
+        return {"messages": ""}
 
 
 def send_msg_to_bot(msg, chat_id, token):
