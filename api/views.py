@@ -645,21 +645,21 @@ class SendPhoto(APIView):
         if "image" in file_type:
             up_file.type = "image"
 
-            bot.send_photo(chat_id=chat_id, photo=f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+            bot.send_photo(chat_id=chat_id, photo=f"https://liveqchat.m1.uz{up_file.file.url}")
         elif "audio" in file_type:
             up_file.type = "audio"
 
-            bot.send_audio(chat_id=chat_id, audio=f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+            bot.send_audio(chat_id=chat_id, audio=f"https://liveqchat.m1.uz{up_file.file.url}")
 
         elif "media" in file_type:
             up_file.type = "media"
 
-            bot.send_video(chat_id = chat_id, video = f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+            bot.send_video(chat_id = chat_id, video = f"https://liveqchat.m1.uz{up_file.file.url}")
         
         elif "document" in file_type:
             up_file.type = "document"
 
-            bot.send_document(chat_id = chat_id, document = f"https://liveqchat.m1.uz/media/{up_file.file.url}")
+            bot.send_document(chat_id = chat_id, document = f"https://liveqchat.m1.uz{up_file.file.url}")
 
         up_file.save()
 
@@ -673,7 +673,7 @@ class SendPhoto(APIView):
             }
         )
 
-        return Response({"photo_url":f"/media/{up_file.file.url}"})
+        return Response({"photo_url":f"{up_file.file.url}"})
 
 
 
