@@ -62,14 +62,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_send(
                 f"operator_list_{operator.id}",
                 {
-                    'type': 'send_data',
-                    "data": [result["messages"][-1]]
+                    'type': 'send.data.user',
+                    "user_data": [result["messages"][-1]]
                 }
             )
             return await self.channel_layer.group_send(
                 self.room_group_name,
                 {
-                    'type': 'send_list_data',
+                    'type': 'send_data',
                     "data": result
                 }
             )
@@ -345,6 +345,10 @@ class ChatListConsumer(AsyncJsonWebsocketConsumer):
 
     async def send_data(self, event):
         data = event['data']
+        await self.send_json(data)
+
+    async def send_data_user(self, event):
+        data = event['user_data']
         await self.send_json(data)
 
     async def send_list_data(self, context):
