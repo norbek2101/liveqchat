@@ -63,7 +63,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 f"operator_list_{operator.id}",
                 {
                     'type': 'send_data',
-                    "data": [result["messages"]]
+                    "data": [result["messages"][-1]]
                 }
             )
             return await self.channel_layer.group_send(
