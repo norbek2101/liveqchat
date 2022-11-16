@@ -11,6 +11,7 @@ import logging
 from accounts.models import (
     Operators
 )
+from tinytag import TinyTag
 from django.db.models import Count
 
 
@@ -261,7 +262,7 @@ def initializer_message_handlers(_: TeleBot):
                     operator=operator
                 )
 
-                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "document")
 
                 inc_msg.file.add(up_file)
                 inc_msg.save()
@@ -315,7 +316,7 @@ def initializer_message_handlers(_: TeleBot):
                     operator=operator
                 )
                 
-                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "image")
 
                 inc_msg.file.add(up_file)
                 inc_msg.save()
@@ -406,8 +407,8 @@ def initializer_message_handlers(_: TeleBot):
                     from_user=True,
                     operator = operator
                 )
-
-                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+                tag = TinyTag.get(path)
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio", duration = tag.duration)
 
                 inc_msg.file.add(up_file)
                 inc_msg.save()
@@ -467,7 +468,7 @@ def initializer_message_handlers(_: TeleBot):
                     operator = operator
                 )
 
-                up_file = File.objects.create(file = str(path).split('media/')[1], type = "audio")
+                up_file = File.objects.create(file = str(path).split('media/')[1], type = "media")
 
                 inc_msg.file.add(up_file)
                 inc_msg.save()
